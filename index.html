@@ -256,7 +256,7 @@
                                 </div>
                             </div>
 
-                            <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors">
+                            <div id="box-toggle-points" class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors">
                                 <div class="flex items-center">
                                     <div class="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300 flex items-center justify-center mr-3">
                                         <i class="fas fa-star"></i>
@@ -484,6 +484,7 @@
             toggle('menu-admin-users', p.admin); 
             
             // Seguridad en Ajustes
+            toggle('box-toggle-points', p.admin); // AHORA SOLO ADMIN VE PUNTOS
             toggle('btn-factory-reset', p.admin);
             toggle('msg-no-perm', !p.admin);
         }
