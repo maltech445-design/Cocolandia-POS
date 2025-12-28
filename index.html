@@ -1,182 +1,215 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cocolandia v5.0 - Gestión de Usuarios</title>
+    <title>Cocolandia v5.5 - Configurable</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // Activa el modo oscuro manual
+        }
+    </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Scrollbar oscuro */
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #1e293b; } /* slate-800 */
-        ::-webkit-scrollbar-thumb { background: #4f46e5; border-radius: 4px; } /* indigo-600 */
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
         .fade-in { animation: fadeIn 0.3s ease-in; }
+        .slide-in { animation: slideIn 0.3s ease-out forwards; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        
+        /* Switch Toggle Styles */
+        .toggle-checkbox:checked { right: 0; border-color: #68D391; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #68D391; }
+        
         body { user-select: none; }
         input { user-select: text; }
-        /* Fondo degradado negro a gris */
-        body {
-            background-image: linear-gradient(to right, #0f172a, #000000, #0f172a); /* slate-900 via black to slate-900 */
-        }
     </style>
 </head>
-<body class="text-slate-200 h-screen font-sans overflow-hidden">
+<body class="bg-slate-100 text-slate-800 h-screen font-sans overflow-hidden transition-colors duration-300 dark:bg-slate-900 dark:text-slate-100">
 
-    <div id="screen-login" class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30">
-        <div class="bg-slate-800 p-10 rounded-3xl shadow-2xl w-full max-w-md text-center animate-fade-in border border-slate-700">
+    <div id="screen-login" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-100 dark:bg-slate-900 transition-colors duration-300">
+        <div class="bg-white dark:bg-slate-800 p-10 rounded-3xl shadow-2xl w-full max-w-md text-center animate-fade-in border border-slate-200 dark:border-slate-700">
             <div class="mb-8">
-                <div class="w-24 h-24 bg-indigo-500 text-white rounded-3xl flex items-center justify-center mx-auto mb-4 text-5xl shadow-lg shadow-indigo-500/20">
+                <div class="w-24 h-24 bg-indigo-600 text-white rounded-3xl flex items-center justify-center mx-auto mb-4 text-5xl shadow-xl">
                     <i class="fas fa-store"></i>
                 </div>
-                <h1 class="text-4xl font-black text-white tracking-tight">Cocolandia</h1>
-                <p class="text-slate-400 font-medium">Versión 5.1 (Dark)</p>
+                <h1 class="text-4xl font-black text-slate-800 dark:text-white tracking-tight">Cocolandia</h1>
+                <p class="text-slate-500 dark:text-slate-400 font-medium">Sistema POS</p>
             </div>
             
             <form onsubmit="login(event)" class="space-y-5 text-left">
                 <div>
-                    <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider">Usuario</label>
-                    <div class="flex items-center bg-slate-700 border-2 border-slate-600 rounded-xl p-3 focus-within:border-indigo-400 transition-all">
+                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 ml-1 uppercase tracking-wider">Usuario</label>
+                    <div class="flex items-center bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-xl p-3 focus-within:border-indigo-500 transition-all">
                         <i class="fas fa-user text-slate-400 mr-3"></i>
-                        <input id="login-user" type="text" class="flex-1 outline-none font-bold text-white bg-transparent placeholder-slate-500" placeholder="Ej. admin" required>
+                        <input id="login-user" type="text" class="flex-1 outline-none font-bold text-slate-700 dark:text-white bg-transparent" placeholder="Ej. admin" required>
                     </div>
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider">Clave de Acceso</label>
-                    <div class="flex items-center bg-slate-700 border-2 border-slate-600 rounded-xl p-3 focus-within:border-indigo-400 transition-all">
+                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 ml-1 uppercase tracking-wider">Clave</label>
+                    <div class="flex items-center bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-xl p-3 focus-within:border-indigo-500 transition-all">
                         <i class="fas fa-key text-slate-400 mr-3"></i>
-                        <input id="login-pass" type="password" class="flex-1 outline-none font-bold text-white bg-transparent placeholder-slate-500" placeholder="••••" required>
+                        <input id="login-pass" type="password" class="flex-1 outline-none font-bold text-slate-700 dark:text-white bg-transparent" placeholder="••••" required>
                     </div>
                 </div>
-                <button class="w-full py-4 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/30 transition-transform active:scale-95 text-lg flex justify-center items-center">
-                    <span>ENTRAR</span>
-                    <i class="fas fa-arrow-right ml-2"></i>
+                <button class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none transition-transform active:scale-95 text-lg">
+                    ENTRAR
                 </button>
             </form>
-            <p class="mt-8 text-xs text-slate-500">Default: <b>Admin</b> / 2508 | <b>cajero</b> / 0000</p>
         </div>
     </div>
 
-    <div id="screen-app" class="hidden h-full flex bg-transparent">
+    <div id="screen-app" class="hidden h-full flex">
         
-        <aside class="w-64 bg-slate-800 border-r border-slate-700 flex flex-col z-10 shadow-xl">
-            <div class="p-6 flex items-center space-x-3 border-b border-slate-700">
-                <div class="bg-indigo-500 text-white p-2 rounded-lg shadow-lg">
+        <aside class="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col z-10 shadow-sm transition-colors duration-300">
+            <div class="p-6 flex items-center space-x-3 border-b border-slate-100 dark:border-slate-700">
+                <div class="bg-indigo-600 text-white p-2 rounded-lg">
                     <i class="fas fa-store text-xl"></i>
                 </div>
                 <div class="overflow-hidden">
-                    <h1 class="text-lg font-bold tracking-tight truncate text-white">Cocolandia</h1>
-                    <div class="flex items-center text-xs text-green-400 font-bold">
-                        <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+                    <h1 class="text-lg font-bold tracking-tight truncate dark:text-white">Cocolandia</h1>
+                    <div class="flex items-center text-xs text-green-600 dark:text-green-400 font-bold">
+                        <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
                         <span id="user-display-name" class="truncate">USUARIO</span>
                     </div>
                 </div>
             </div>
 
             <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
-                <button onclick="nav('pos')" id="btn-pos" class="nav-btn w-full flex items-center p-4 rounded-xl text-slate-400 hover:bg-slate-700/50 transition-all">
+                <button onclick="nav('pos')" id="btn-pos" class="nav-btn w-full flex items-center p-4 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
                     <i class="fas fa-cash-register w-6 text-center"></i><span class="ml-3 font-medium">Caja</span>
                 </button>
-                <button onclick="nav('clientes')" id="btn-clientes" class="nav-btn w-full flex items-center p-4 rounded-xl text-slate-400 hover:bg-slate-700/50 transition-all">
+                <button onclick="nav('clientes')" id="btn-clientes" class="nav-btn w-full flex items-center p-4 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
                     <i class="fas fa-users w-6 text-center"></i><span class="ml-3 font-medium">Clientes</span>
                 </button>
-                <button onclick="nav('inventario')" id="btn-inventario" class="nav-btn w-full flex items-center p-4 rounded-xl text-slate-400 hover:bg-slate-700/50 transition-all">
+                <button onclick="nav('inventario')" id="btn-inventario" class="nav-btn w-full flex items-center p-4 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
                     <i class="fas fa-boxes w-6 text-center"></i><span class="ml-3 font-medium">Inventario</span>
                 </button>
-                <button onclick="nav('ventas')" id="btn-ventas" class="nav-btn w-full flex items-center p-4 rounded-xl text-slate-400 hover:bg-slate-700/50 transition-all">
+                <button onclick="nav('ventas')" id="btn-ventas" class="nav-btn w-full flex items-center p-4 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
                     <i class="fas fa-chart-line w-6 text-center"></i><span class="ml-3 font-medium">Historial</span>
                 </button>
                 
-                <div id="menu-admin-users" class="border-t border-slate-700 my-2 pt-2 hidden">
-                    <p class="px-4 text-xs font-bold text-slate-500 uppercase mb-1">Admin</p>
-                    <button onclick="nav('users')" id="btn-users" class="nav-btn w-full flex items-center p-4 rounded-xl text-slate-400 hover:bg-slate-700/50 transition-all">
+                <div id="menu-admin-users" class="hidden border-t border-slate-100 dark:border-slate-700 mt-2 pt-2">
+                    <p class="px-4 text-xs font-bold text-slate-400 uppercase mb-1">Admin</p>
+                    <button onclick="nav('users')" id="btn-users" class="nav-btn w-full flex items-center p-4 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
                         <i class="fas fa-user-shield w-6 text-center"></i><span class="ml-3 font-medium">Usuarios</span>
                     </button>
                 </div>
             </nav>
 
-            <div class="p-4 border-t border-slate-700 bg-slate-800/50 space-y-2">
-                <button onclick="prepararCierreCaja()" class="w-full flex items-center justify-center p-3 rounded-xl text-indigo-300 hover:bg-indigo-500/10 font-bold text-sm transition-all border border-indigo-500/30">
+            <div class="p-4 border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 space-y-2">
+                <button onclick="prepararCierreCaja()" class="w-full flex items-center justify-center p-3 rounded-xl text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 font-bold text-sm transition-all border border-indigo-200 dark:border-indigo-800">
                     <i class="fas fa-file-invoice-dollar mr-2"></i> Cierre de Caja
                 </button>
-                <button onclick="logout()" class="w-full flex items-center justify-center p-3 rounded-xl text-red-400 hover:bg-red-500/10 font-bold text-sm transition-all border border-red-500/30">
-                    <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+                <button onclick="logout()" class="w-full flex items-center justify-center p-3 rounded-xl text-red-500 hover:bg-red-100 dark:hover:bg-red-900/20 font-bold text-sm transition-all border border-red-200 dark:border-red-900/30">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Salir
                 </button>
             </div>
         </aside>
 
-        <main class="flex-1 relative flex flex-col min-w-0 bg-transparent overflow-hidden">
+        <main class="flex-1 relative flex flex-col min-w-0 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+            
+            <button onclick="toggleSettings()" class="absolute top-4 right-4 z-40 bg-white dark:bg-slate-800 p-3 rounded-full shadow-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:scale-110 transition-transform">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+
             <div id="view-pos" class="view-section hidden flex-1 flex h-full">
                 <div class="flex-1 p-6 overflow-y-auto flex flex-col">
-                    <div class="bg-slate-800 p-4 rounded-2xl shadow-sm flex items-center border border-slate-700 mb-4 sticky top-0 z-20">
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm flex items-center border border-slate-200 dark:border-slate-700 mb-4 sticky top-0 z-20">
                         <i class="fas fa-search text-slate-400 ml-2"></i>
-                        <input type="text" id="buscador" oninput="renderPos(this.value)" placeholder="Buscar producto..." class="flex-1 ml-4 outline-none text-lg bg-transparent text-white placeholder-slate-500" autofocus>
+                        <input type="text" id="buscador" oninput="renderPos(this.value)" placeholder="Buscar producto..." class="flex-1 ml-4 outline-none text-lg bg-transparent dark:text-white" autofocus>
                     </div>
                     <div id="grid-productos" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 pb-20"></div>
                 </div>
-                
-                <div class="w-96 bg-slate-800 shadow-2xl border-l border-slate-700 flex flex-col z-30">
-                    <div class="p-4 bg-slate-700/50 border-b border-slate-700">
+                <div class="w-96 bg-white dark:bg-slate-800 shadow-2xl border-l border-slate-200 dark:border-slate-700 flex flex-col z-30 transition-colors duration-300">
+                    <div class="p-4 bg-indigo-50 dark:bg-slate-700/50 border-b border-indigo-100 dark:border-slate-700">
                         <div class="flex justify-between items-center mb-2">
-                            <span class="font-bold text-indigo-300 text-sm"><i class="fas fa-id-card mr-1"></i> Cliente</span>
-                            <span id="puntos-badge" class="hidden bg-orange-500/20 text-orange-300 text-xs font-bold px-2 py-1 rounded-full border border-orange-500/30">0 pts</span>
+                            <span class="font-bold text-indigo-900 dark:text-indigo-300 text-sm">CLIENTE</span>
+                            <span id="puntos-badge" class="hidden bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 text-xs font-bold px-2 py-1 rounded-full">0 pts</span>
                         </div>
                         <div class="flex space-x-2" id="client-search-box">
-                            <input type="text" id="input-client" placeholder="Tel/ID" class="flex-1 p-2 text-sm bg-slate-800 border border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none text-white placeholder-slate-500">
-                            <button onclick="buscarCliente()" class="bg-indigo-500 text-white px-3 rounded-lg hover:bg-indigo-600"><i class="fas fa-search"></i></button>
-                            <button onclick="modalCliente()" class="bg-green-500 text-white px-3 rounded-lg hover:bg-green-600"><i class="fas fa-plus"></i></button>
+                            <input type="text" id="input-client" placeholder="Tel/ID" class="flex-1 p-2 text-sm border dark:border-slate-600 rounded-lg outline-none dark:bg-slate-700 dark:text-white">
+                            <button onclick="buscarCliente()" class="bg-indigo-600 text-white px-3 rounded-lg"><i class="fas fa-search"></i></button>
+                            <button onclick="modalCliente()" class="bg-green-500 text-white px-3 rounded-lg"><i class="fas fa-plus"></i></button>
                         </div>
-                        <div id="client-info-box" class="hidden bg-slate-700 p-3 rounded-lg border border-indigo-500/30 shadow-sm relative mt-2">
-                            <button onclick="quitarCliente()" class="absolute top-1 right-1 text-slate-400 hover:text-red-400"><i class="fas fa-times-circle"></i></button>
-                            <div class="font-bold text-white" id="lbl-cli-nombre">Nombre</div>
-                            <div class="text-xs text-slate-400">ID: <span id="lbl-cli-id">---</span></div>
+                        <div id="client-info-box" class="hidden bg-white dark:bg-slate-700 p-3 rounded-lg border dark:border-slate-600 shadow-sm relative mt-2">
+                            <button onclick="quitarCliente()" class="absolute top-1 right-1 text-slate-400 hover:text-red-500"><i class="fas fa-times-circle"></i></button>
+                            <div class="font-bold text-slate-800 dark:text-white" id="lbl-cli-nombre">Nombre</div>
+                            <div class="text-xs text-slate-500 dark:text-slate-400">ID: <span id="lbl-cli-id">---</span></div>
                         </div>
                     </div>
-                    <div class="p-3 border-b border-slate-700 bg-slate-800 flex justify-between items-center">
-                        <h2 class="font-bold text-sm text-slate-300">Carrito</h2>
-                        <span class="text-xs text-slate-500" id="cart-count">0 items</span>
+                    <div class="p-3 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex justify-between items-center">
+                        <h2 class="font-bold text-sm text-slate-700 dark:text-slate-300">Carrito</h2>
+                        <span class="text-xs text-slate-400" id="cart-count">0 items</span>
                     </div>
-                    <div id="cart-list" class="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin"></div>
-                    <div class="p-5 bg-slate-800 border-t border-slate-700 shadow-[0_-5px_15px_rgba(0,0,0,0.2)]">
+                    <div id="cart-list" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+                    <div class="p-5 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700">
                         <div class="flex justify-between items-end mb-4">
-                            <span class="text-sm font-medium text-slate-400">Total</span>
-                            <span id="lbl-total" class="text-4xl font-black text-white">$0.00</span>
+                            <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Total</span>
+                            <span id="lbl-total" class="text-4xl font-black text-slate-800 dark:text-white">$0.00</span>
                         </div>
                         <div class="space-y-3">
-                            <input type="number" id="input-pago" oninput="calcCambio()" placeholder="Monto Efectivo" class="w-full p-4 bg-slate-700 border border-slate-600 rounded-xl outline-none font-bold text-lg text-white placeholder-slate-500 focus:border-indigo-400 transition-all">
-                            <div id="lbl-cambio" class="hidden text-right text-sm font-bold text-green-400">Cambio: $0.00</div>
-                            <button onclick="cobrar('efectivo')" class="w-full py-3 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/20">COBRAR EFECTIVO</button>
-                            <button id="btn-pay-points" onclick="cobrar('puntos')" disabled class="w-full py-3 bg-slate-700 text-slate-500 font-bold rounded-xl text-sm cursor-not-allowed border border-slate-600">Selecciona cliente</button>
+                            <input type="number" id="input-pago" oninput="calcCambio()" placeholder="Monto Efectivo" class="w-full p-4 border dark:border-slate-600 rounded-xl outline-none font-bold text-lg dark:bg-slate-700 dark:text-white">
+                            <div id="lbl-cambio" class="hidden text-right text-sm font-bold text-green-600 dark:text-green-400">Cambio: $0.00</div>
+                            <button onclick="cobrar('efectivo')" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg">COBRAR EFECTIVO</button>
+                            <button id="btn-pay-points" onclick="cobrar('puntos')" disabled class="w-full py-3 bg-slate-300 dark:bg-slate-700 text-slate-500 font-bold rounded-xl text-sm cursor-not-allowed">Selecciona cliente</button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div id="view-users" class="view-section hidden flex-1 p-8 overflow-y-auto">
-                <h2 class="text-3xl font-bold mb-8 text-white">Usuarios</h2>
-                <div class="bg-slate-800 rounded-2xl shadow-sm border border-slate-700 overflow-hidden">
+                <h2 class="text-3xl font-bold mb-8 dark:text-white">Usuarios</h2>
+                <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border dark:border-slate-700 overflow-hidden">
                     <table class="w-full text-left">
-                        <thead class="bg-slate-700/50 border-b border-slate-700"><tr><th class="p-4 text-slate-300">Usuario</th><th class="p-4 text-slate-300">Nombre</th><th class="p-4 text-slate-300">Rol</th></tr></thead>
-                        <tbody id="table-users" class="divide-y divide-slate-700"></tbody>
+                        <thead class="bg-slate-50 dark:bg-slate-700/50 border-b dark:border-slate-700"><tr><th class="p-4 dark:text-slate-300">Usuario</th><th class="p-4 dark:text-slate-300">Nombre</th><th class="p-4 dark:text-slate-300">Rol</th></tr></thead>
+                        <tbody id="table-users" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
                     </table>
                 </div>
             </div>
-            <div id="view-ventas" class="view-section hidden flex-1 p-8 overflow-y-auto"><h2 class="text-2xl font-bold mb-6 text-white">Historial</h2><div id="list-ventas" class="space-y-2"></div></div>
-            <div id="view-clientes" class="view-section hidden flex-1 p-8 overflow-y-auto"><h2 class="text-2xl font-bold mb-6 text-white">Clientes</h2><div class="bg-slate-800 rounded-xl shadow border border-slate-700 overflow-hidden"><table class="w-full text-left"><tbody id="table-clientes" class="divide-y divide-slate-700"></tbody></table></div></div>
-            <div id="view-inventario" class="view-section hidden flex-1 p-8 overflow-y-auto"><h2 class="text-2xl font-bold mb-6 text-white">Inventario</h2><div class="bg-slate-800 rounded-xl shadow border border-slate-700 overflow-hidden"><table class="w-full text-left"><tbody id="table-inv" class="divide-y divide-slate-700"></tbody></table></div></div>
+            <div id="view-ventas" class="view-section hidden flex-1 p-8 overflow-y-auto"><h2 class="text-2xl font-bold mb-6 dark:text-white">Historial</h2><div id="list-ventas" class="space-y-2"></div></div>
+            <div id="view-clientes" class="view-section hidden flex-1 p-8 overflow-y-auto"><h2 class="text-2xl font-bold mb-6 dark:text-white">Clientes</h2><div class="bg-white dark:bg-slate-800 rounded-xl shadow overflow-hidden border dark:border-slate-700"><table class="w-full text-left"><tbody id="table-clientes" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody></table></div></div>
+            <div id="view-inventario" class="view-section hidden flex-1 p-8 overflow-y-auto"><h2 class="text-2xl font-bold mb-6 dark:text-white">Inventario</h2><div class="bg-white dark:bg-slate-800 rounded-xl shadow overflow-hidden border dark:border-slate-700"><table class="w-full text-left"><tbody id="table-inv" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody></table></div></div>
         </main>
+
+        <div id="settings-panel" class="fixed inset-y-0 right-0 w-80 bg-white dark:bg-slate-900 shadow-2xl transform translate-x-full transition-transform duration-300 z-50 border-l border-slate-200 dark:border-slate-700 flex flex-col">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                <h2 class="text-xl font-bold dark:text-white">Ajustes</h2>
+                <button onclick="toggleSettings()" class="text-slate-400 hover:text-red-500"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="p-6 flex-1 space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="font-bold text-slate-800 dark:text-white"><i class="fas fa-moon mr-2 text-indigo-500"></i> Modo Nocturno</div>
+                        <div class="text-xs text-slate-500">Cambiar a colores oscuros</div>
+                    </div>
+                    <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                        <input type="checkbox" name="toggle" id="dark-mode-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" onclick="toggleTheme()"/>
+                        <label for="dark-mode-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 cursor-pointer"></label>
+                    </div>
+                </div>
+                <hr class="dark:border-slate-800">
+                <div class="text-center p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                    <p class="text-xs text-slate-400 font-bold mb-2">Versión de App</p>
+                    <p class="text-lg font-black text-indigo-600 dark:text-indigo-400">v5.5.0</p>
+                </div>
+            </div>
+        </div>
+        <div id="settings-overlay" onclick="toggleSettings()" class="fixed inset-0 bg-black/50 z-40 hidden backdrop-blur-sm transition-opacity"></div>
     </div>
 
-    <div id="modal-cliente" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-slate-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl border border-slate-700">
-            <h3 class="text-xl font-bold mb-4 text-white">Registrar Cliente</h3>
+    <div id="modal-cliente" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-xl font-bold mb-4 dark:text-white">Nuevo Cliente</h3>
             <form onsubmit="saveCliente(event)" class="space-y-4">
-                <input id="new-cli-id" disabled class="w-full bg-slate-700 border border-slate-600 p-3 rounded-xl text-slate-400 font-mono">
-                <input id="new-cli-nom" required class="w-full bg-slate-700 border border-slate-600 p-3 rounded-xl text-white placeholder-slate-500 focus:border-indigo-400 outline-none" placeholder="Nombre Completo">
-                <input id="new-cli-tel" required class="w-full bg-slate-700 border border-slate-600 p-3 rounded-xl text-white placeholder-slate-500 focus:border-indigo-400 outline-none" placeholder="Teléfono">
-                <div class="flex space-x-3">
-                    <button type="button" onclick="document.getElementById('modal-cliente').classList.add('hidden')" class="flex-1 py-3 bg-slate-700 text-slate-300 rounded-xl font-bold hover:bg-slate-600">Cancelar</button>
-                    <button class="flex-1 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold">Guardar</button>
-                </div>
+                <input id="new-cli-id" disabled class="w-full bg-slate-100 dark:bg-slate-700 dark:text-white border dark:border-slate-600 p-2 rounded">
+                <input id="new-cli-nom" required class="w-full border dark:border-slate-600 dark:bg-slate-700 dark:text-white p-2 rounded" placeholder="Nombre">
+                <input id="new-cli-tel" required class="w-full border dark:border-slate-600 dark:bg-slate-700 dark:text-white p-2 rounded" placeholder="Teléfono">
+                <button class="w-full py-2 bg-blue-600 text-white rounded font-bold">Guardar</button>
+                <button type="button" onclick="document.getElementById('modal-cliente').classList.add('hidden')" class="w-full py-2 text-slate-500">Cancelar</button>
             </form>
         </div>
     </div>
@@ -184,7 +217,7 @@
     <script>
         // --- BASE DE DATOS ---
         const DB = {
-            inv: () => JSON.parse(localStorage.getItem('coco_inv')) || [{id:'001',nombre:'Coca Cola Test',precio:18.50,stock:50}],
+            inv: () => JSON.parse(localStorage.getItem('coco_inv')) || [{id:'001',nombre:'Producto Prueba',precio:100,stock:50}],
             cli: () => JSON.parse(localStorage.getItem('coco_clientes')) || [],
             ven: () => JSON.parse(localStorage.getItem('coco_ven')) || [],
             users: () => JSON.parse(localStorage.getItem('coco_users')) || [
@@ -195,24 +228,48 @@
             save: (key, data) => localStorage.setItem(key, JSON.stringify(data))
         };
 
-        // --- ESTADO ---
         let carrito = [];
         let clienteActivo = null;
         let currentUser = null;
 
-        // --- LOGIN & SESIÓN ---
+        // --- INICIO DE APP (Verificar Tema) ---
+        (function initTheme() {
+            const saved = localStorage.getItem('coco_theme');
+            if(saved === 'dark') {
+                document.documentElement.classList.add('dark');
+                document.getElementById('dark-mode-toggle').checked = true;
+            }
+        })();
+
+        // --- SISTEMA DE UI ---
+        function toggleSettings() {
+            const panel = document.getElementById('settings-panel');
+            const overlay = document.getElementById('settings-overlay');
+            if (panel.classList.contains('translate-x-full')) {
+                panel.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                panel.classList.add('translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            html.classList.toggle('dark');
+            localStorage.setItem('coco_theme', html.classList.contains('dark') ? 'dark' : 'light');
+        }
+
         function login(e) {
             e.preventDefault();
             const u = document.getElementById('login-user').value;
             const p = document.getElementById('login-pass').value;
             const found = DB.users().find(x => x.user === u && x.pass === p);
-
             if (found) {
                 currentUser = {...found, inicioTurno: new Date()};
                 document.getElementById('screen-login').classList.add('hidden');
                 document.getElementById('screen-app').classList.remove('hidden');
                 document.getElementById('user-display-name').textContent = found.name.toUpperCase();
-                
                 if(currentUser.role === 'admin') document.getElementById('menu-admin-users').classList.remove('hidden');
                 nav('pos'); renderPos(); renderCliTable(); renderHist(); renderUsersTable();
             } else { alert("Datos incorrectos"); }
@@ -229,85 +286,19 @@
         function nav(vista) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
             document.getElementById('view-' + vista).classList.remove('hidden');
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.className = 'nav-btn w-full flex items-center p-4 rounded-xl text-slate-400 hover:bg-slate-700/50 transition-all');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.className = 'nav-btn w-full flex items-center p-4 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all');
             const active = document.getElementById('btn-' + vista);
-            if(active) active.className = 'nav-btn w-full flex items-center p-4 rounded-xl bg-indigo-500/10 text-indigo-300 font-bold border border-indigo-500/20';
+            if(active) active.className = 'nav-btn w-full flex items-center p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 font-bold';
         }
 
-        // --- CIERRE DE CAJA (MODO OSCURO) ---
-        function prepararCierreCaja() {
-            if (!currentUser) return;
-            const ahora = new Date();
-            const inicio = new Date(currentUser.inicioTurno);
-            const difMs = ahora - inicio;
-            const horas = Math.floor(difMs / 3600000);
-            const minutos = Math.floor((difMs % 3600000) / 60000);
-
-            const ventasTurno = DB.ven().filter(v => v.vendedor === currentUser.user && new Date(v.fechaRaw || v.id) >= inicio);
-            const totalEfectivo = ventasTurno.filter(v => v.metodo === 'Efectivo').reduce((s, v) => s + v.total, 0);
-            const totalPuntos = ventasTurno.filter(v => v.metodo === 'Puntos').reduce((s, v) => s + v.total, 0);
-
-            const data = {
-                vendedor: currentUser.user,
-                nombre: currentUser.name,
-                fechaInicio: inicio.toLocaleString(),
-                fechaCierre: ahora.toLocaleString(),
-                horasLaboradas: `${horas}h ${minutos}m`,
-                efectivo: totalEfectivo,
-                puntos: totalPuntos,
-                total: totalEfectivo + totalPuntos,
-                numVentas: ventasTurno.length
-            };
-
-            const modal = document.createElement('div');
-            modal.id = 'modal-cierre';
-            modal.className = 'fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-sm';
-            modal.innerHTML = `
-                <div class="bg-slate-800 w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl p-6 font-mono text-sm text-slate-200 border border-slate-700">
-                    <div class="text-center border-b-2 border-dashed border-slate-600 pb-4 mb-4">
-                        <h2 class="text-xl font-black text-white">COCOLANDIA</h2>
-                        <p class="text-slate-400">CIERRE DE TURNO</p>
-                    </div>
-                    <div class="space-y-2 mb-6 text-[11px] text-slate-300">
-                        <p><b>CAJERO:</b> <span class="text-white">${data.nombre}</span></p>
-                        <p><b>INICIO:</b> ${data.fechaInicio}</p>
-                        <p><b>CIERRE:</b> ${data.fechaCierre}</p>
-                        <p><b>TIEMPO:</b> ${data.horasLaboradas}</p>
-                    </div>
-                    <div class="border-b-2 border-dashed border-slate-600 pb-4 mb-4 space-y-1">
-                        <div class="flex justify-between font-bold text-white"><span>VENTAS (${data.numVentas})</span> <span>$${data.total.toFixed(2)}</span></div>
-                        <div class="flex justify-between text-slate-400"><span>- Efectivo</span> <span>$${data.efectivo.toFixed(2)}</span></div>
-                        <div class="flex justify-between text-slate-400"><span>- Puntos</span> <span>$${data.puntos.toFixed(2)}</span></div>
-                    </div>
-                    <div class="text-center mb-6">
-                         <p class="text-xs text-slate-400 mb-1">TOTAL EFECTIVO EN CAJA</p>
-                        <div class="text-2xl font-black text-indigo-300">$${data.efectivo.toFixed(2)}</div>
-                    </div>
-                    <div class="space-y-3">
-                        <button onclick='confirmarCierre(${JSON.stringify(data)})' class="w-full py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/20">TERMINAR Y CERRAR SESIÓN</button>
-                        <button onclick="document.getElementById('modal-cierre').remove()" class="w-full py-3 bg-slate-700 text-slate-300 font-bold rounded-xl hover:bg-slate-600">VOLVER</button>
-                    </div>
-                </div>`;
-            document.body.appendChild(modal);
-        }
-
-        function confirmarCierre(data) {
-            const turnos = DB.turnos();
-            turnos.push(data);
-            DB.save('coco_turnos', turnos);
-            alert("Turno guardado correctamente.");
-            document.getElementById('modal-cierre').remove();
-            logout();
-        }
-
-        // --- POS & VENTAS (ESTILOS OSCUROS) ---
+        // --- POS & VENTAS ---
         function renderPos(f='') {
             const grid = document.getElementById('grid-productos'); grid.innerHTML = '';
             DB.inv().filter(p => p.nombre.toLowerCase().includes(f.toLowerCase()) || p.id.includes(f)).forEach(p => {
                 grid.innerHTML += `
-                    <div onclick="addCarro('${p.id}')" class="bg-slate-800 p-4 rounded-xl border border-slate-700 hover:border-indigo-400 cursor-pointer shadow-sm group transition-all ${p.stock<=0?'opacity-50 grayscale':''}">
-                        <h3 class="font-bold text-white text-sm mb-3 h-10 overflow-hidden group-hover:text-indigo-300 transition-colors">${p.nombre}</h3>
-                        <div class="flex justify-between items-end"><span class="text-xl font-black text-indigo-400">$${p.precio.toFixed(2)}</span><span class="text-[10px] text-slate-400 font-bold">STOCK: ${p.stock}</span></div>
+                    <div onclick="addCarro('${p.id}')" class="bg-white dark:bg-slate-800 p-4 rounded-xl border dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 cursor-pointer shadow-sm ${p.stock<=0?'opacity-50 grayscale':''}">
+                        <h3 class="font-bold text-slate-800 dark:text-white text-sm mb-3 h-10 overflow-hidden">${p.nombre}</h3>
+                        <div class="flex justify-between items-end"><span class="text-xl font-black text-indigo-600 dark:text-indigo-400">$${p.precio}</span><span class="text-[10px] text-slate-400 font-bold">STOCK: ${p.stock}</span></div>
                     </div>`;
             });
         }
@@ -315,7 +306,7 @@
         function addCarro(id) {
             const p = DB.inv().find(x => x.id === id); if(!p || p.stock <= 0) return alert("Agotado");
             const item = carrito.find(x => x.id === id);
-            if(item) { if(item.cant < p.stock) item.cant++; else alert("Sin stock disponible"); } else carrito.push({...p, cant: 1});
+            if(item) { if(item.cant < p.stock) item.cant++; else alert("Sin stock"); } else carrito.push({...p, cant: 1});
             renderCart();
         }
 
@@ -323,9 +314,9 @@
             const list = document.getElementById('cart-list'); list.innerHTML = ''; let total = 0;
             carrito.forEach((p, i) => {
                 total += p.precio * p.cant;
-                list.innerHTML += `<div class="flex justify-between items-center bg-slate-700 p-2 rounded-lg border border-slate-600 text-xs">
-                    <div><b class="text-white">${p.nombre}</b><br><span class="text-slate-400">$${p.precio.toFixed(2)} x ${p.cant}</span></div>
-                    <div class="flex items-center gap-1"><button onclick="modCart(${i},-1)" class="w-6 h-6 bg-slate-600 text-white rounded hover:bg-slate-500">-</button><button onclick="modCart(${i},1)" class="w-6 h-6 bg-indigo-500 text-white rounded hover:bg-indigo-600">+</button></div>
+                list.innerHTML += `<div class="flex justify-between items-center bg-slate-50 dark:bg-slate-700 p-2 rounded border dark:border-slate-600 text-xs">
+                    <div><b class="dark:text-white">${p.nombre}</b><br><span class="text-slate-500 dark:text-slate-400">$${p.precio} x ${p.cant}</span></div>
+                    <div class="flex items-center gap-1"><button onclick="modCart(${i},-1)" class="w-6 h-6 bg-white dark:bg-slate-600 dark:text-white rounded shadow">-</button><button onclick="modCart(${i},1)" class="w-6 h-6 bg-indigo-100 dark:bg-indigo-900 dark:text-indigo-300 rounded shadow">+</button></div>
                 </div>`;
             });
             document.getElementById('lbl-total').textContent = '$' + total.toFixed(2);
@@ -392,8 +383,8 @@
         function quitarCliente() { clienteActivo = null; updateClienteUI(); }
         function updateBtnPuntos() {
             const btn = document.getElementById('btn-pay-points'); const total = carrito.reduce((s,i)=>s+(i.precio*i.cant),0);
-            if(clienteActivo && total > 0 && clienteActivo.puntos >= total) { btn.disabled = false; btn.className = "w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl shadow-lg transition-all"; btn.textContent = `Pagar con Puntos (${clienteActivo.puntos})`; }
-            else { btn.disabled = true; btn.className = "w-full py-3 bg-slate-700 text-slate-500 rounded-xl cursor-not-allowed border border-slate-600"; btn.textContent = "Puntos insuficientes"; }
+            if(clienteActivo && total > 0 && clienteActivo.puntos >= total) { btn.disabled = false; btn.className = "w-full py-3 bg-green-500 text-white font-bold rounded-xl"; btn.textContent = `Pagar con Puntos (${clienteActivo.puntos})`; }
+            else { btn.disabled = true; btn.className = "w-full py-3 bg-slate-300 dark:bg-slate-700 text-slate-500 font-bold rounded-xl cursor-not-allowed"; btn.textContent = "Puntos insuficientes"; }
         }
         function modalCliente() {
             document.getElementById('new-cli-id').value = 'WT' + Date.now().toString().slice(-5);
@@ -405,10 +396,33 @@
             DB.save('coco_clientes', clis); document.getElementById('modal-cliente').classList.add('hidden'); renderCliTable();
         }
 
-        // --- TABLAS AUXILIARES (MODO OSCURO) ---
-        function renderCliTable() { const t = document.getElementById('table-clientes'); t.innerHTML = ''; DB.cli().forEach(c => t.innerHTML += `<tr class="border-b border-slate-700 hover:bg-slate-700/50"><td class="p-3 text-xs font-bold text-white">${c.id}</td><td class="p-3 text-xs text-slate-300">${c.nombre}</td><td class="p-3 text-xs text-orange-400 font-bold">${c.puntos} pts</td></tr>`); }
-        function renderUsersTable() { const t = document.getElementById('table-users'); t.innerHTML = ''; DB.users().forEach(u => t.innerHTML += `<tr class="border-b border-slate-700 hover:bg-slate-700/50"><td class="p-4 text-xs font-bold text-white">${u.user}</td><td class="p-4 text-xs text-slate-300">${u.name}</td><td class="p-4 text-xs uppercase font-black text-indigo-300">${u.role}</td></tr>`); }
-        function renderHist() { const l = document.getElementById('list-ventas'); l.innerHTML = ''; DB.ven().forEach(v => l.innerHTML += `<div class="bg-slate-800 p-3 border border-slate-700 rounded-lg text-xs flex justify-between mb-2"><div><b class="text-white">#${v.id.toString().slice(-4)}</b> <span class="text-slate-400">- ${v.vendedor}</span></div><b class="text-indigo-300">$${v.total.toFixed(2)}</b></div>`); }
+        // --- CIERRE CAJA ---
+        function prepararCierreCaja() {
+            if (!currentUser) return;
+            const data = { nombre: currentUser.name, fechaInicio: new Date(currentUser.inicioTurno).toLocaleString(), fechaCierre: new Date().toLocaleString(), horasLaboradas: '0h 0m', efectivo: 0, puntos: 0, total: 0, numVentas: 0 };
+            
+            const modal = document.createElement('div');
+            modal.id = 'modal-cierre';
+            modal.className = 'fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-sm';
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-3xl p-6 font-mono text-sm dark:text-white border dark:border-slate-700">
+                    <div class="text-center border-b-2 border-dashed border-slate-300 dark:border-slate-600 pb-4 mb-4">
+                        <h2 class="text-xl font-black">CIERRE DE TURNO</h2>
+                        <p class="text-xs text-slate-500">¿Estás seguro de cerrar sesión?</p>
+                    </div>
+                    <div class="space-y-3">
+                        <button onclick='confirmarCierre(${JSON.stringify(data)})' class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold">CERRAR TURNO</button>
+                        <button onclick="document.getElementById('modal-cierre').remove()" class="w-full py-3 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold rounded-xl">CANCELAR</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(modal);
+        }
+        function confirmarCierre(data) { document.getElementById('modal-cierre').remove(); logout(); }
+
+        // --- AUXILIARES ---
+        function renderCliTable() { const t = document.getElementById('table-clientes'); t.innerHTML = ''; DB.cli().forEach(c => t.innerHTML += `<tr class="border-b dark:border-slate-700"><td class="p-3 text-xs font-bold dark:text-white">${c.id}</td><td class="p-3 text-xs dark:text-slate-300">${c.nombre}</td><td class="p-3 text-xs text-orange-600 font-bold">${c.puntos} pts</td></tr>`); }
+        function renderUsersTable() { const t = document.getElementById('table-users'); t.innerHTML = ''; DB.users().forEach(u => t.innerHTML += `<tr class="border-b dark:border-slate-700"><td class="p-4 text-xs font-bold dark:text-white">${u.user}</td><td class="p-4 text-xs dark:text-slate-300">${u.name}</td><td class="p-4 text-xs uppercase font-black">${u.role}</td></tr>`); }
+        function renderHist() { const l = document.getElementById('list-ventas'); l.innerHTML = ''; DB.ven().forEach(v => l.innerHTML += `<div class="bg-white dark:bg-slate-800 p-3 border dark:border-slate-700 rounded text-xs flex justify-between mb-2"><div class="dark:text-white">#${v.id}</div><div class="font-bold dark:text-white">$${v.total}</div></div>`); }
     </script>
 </body>
 </html>
