@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cocolandia v6.5 - PRO MANAGEMENT</title>
+    <title>Cocolandia v6.0.0 - Final</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -12,413 +13,336 @@
             theme: {
                 extend: {
                     colors: {
-                        dark: '#0f172a',
-                        panel: '#1e293b',
-                        surface: '#263345',
-                        primary: '#4f46e5', // Indigo-600
-                        accent: '#8b5cf6'  // Violet-500
+                        dark: '#0f172a',      // Fondo
+                        panel: '#1e293b',     // Tarjetas
+                        header: '#263345',    // Cabecera Tabla
+                        primary: '#6366f1',   // Indigo
+                        success: '#10b981',   // Verde
+                        danger: '#ef4444'     // Rojo
                     }
                 }
             }
         }
     </script>
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        
-        /* Scrollbar personalizada */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-        /* Animaciones */
-        .modal-enter { opacity: 0; transform: scale(0.95); pointer-events: none; }
-        .modal-active { opacity: 1; transform: scale(1); pointer-events: auto; }
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
         
-        /* Toast Notification */
-        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 100; }
-        .toast { transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
-        .toast.show { transform: translateX(0); }
+        /* Animaciones */
+        .fade-in { animation: fadeIn 0.2s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        
+        .toast { transition: all 0.3s ease; transform: translateX(100%); opacity: 0; }
+        .toast.show { transform: translateX(0); opacity: 1; }
+
+        /* Scrollbar discreto */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
-<body class="bg-dark text-slate-300 h-screen w-screen overflow-hidden flex text-sm selection:bg-primary selection:text-white">
+<body class="bg-dark text-slate-300 h-screen w-screen overflow-hidden flex select-none">
 
-    <aside class="w-64 bg-panel flex flex-col border-r border-slate-700/50 shrink-0 relative z-20">
-        <div class="p-5 flex-1">
-            <div class="flex items-center gap-3 mb-10 select-none">
-                <div class="bg-gradient-to-br from-primary to-accent p-2.5 rounded-xl text-white shadow-lg shadow-primary/30">
-                    <i class="fa-solid fa-store text-lg"></i>
+    <aside class="w-64 bg-panel border-r border-slate-700/50 flex flex-col justify-between shrink-0 z-20">
+        <div class="p-5">
+            <div class="flex items-center gap-3 mb-10">
+                <div class="bg-gradient-to-br from-indigo-500 to-purple-600 p-2.5 rounded-xl text-white shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-store"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-white text-base tracking-tight">Cocolandia</h1>
-                    <div class="flex items-center gap-2">
-                        <span class="text-[10px] text-slate-400 font-mono">v6.5 PRO</span>
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <h1 class="font-bold text-white text-lg leading-tight">Cocolandia</h1>
+                    <div class="text-[10px] text-slate-500 font-mono flex items-center gap-2">
+                        v6.0.0 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     </div>
                 </div>
             </div>
 
             <nav class="space-y-1">
-                <a href="#" class="nav-item group flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-cash-register w-5 text-center group-hover:text-primary transition"></i> Caja
+                <a href="#" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-700/50 transition group">
+                    <i class="fa-solid fa-cash-register w-5 text-center text-slate-400 group-hover:text-white"></i> Caja
                 </a>
-                <a href="#" class="nav-item group flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-users w-5 text-center group-hover:text-primary transition"></i> Clientes
+                <a href="#" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-700/50 transition group">
+                    <i class="fa-solid fa-users w-5 text-center text-slate-400 group-hover:text-white"></i> Clientes
                 </a>
-                <a href="#" class="nav-item group flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-boxes-stacked w-5 text-center group-hover:text-primary transition"></i> Inventario
-                </a>
-                <a href="#" class="nav-item group flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-chart-pie w-5 text-center group-hover:text-primary transition"></i> Reportes
+                <a href="#" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-700/50 transition group">
+                    <i class="fa-solid fa-boxes-stacked w-5 text-center text-slate-400 group-hover:text-white"></i> Inventario
                 </a>
                 
                 <div class="my-4 border-t border-slate-700/50"></div>
-                <div class="mb-2 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Administración</div>
+                <div class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Administración</div>
                 
-                <a href="#" class="flex items-center gap-3 p-3 rounded-lg bg-primary/10 text-primary border border-primary/20 font-medium relative overflow-hidden">
-                    <div class="absolute inset-0 bg-primary/5"></div>
-                    <i class="fa-solid fa-user-gear w-5 text-center relative z-10"></i> <span class="relative z-10">Usuarios</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-screwdriver-wrench w-5 text-center group-hover:text-primary transition"></i> Configuración
+                <a href="#" class="flex items-center gap-3 p-3 rounded-lg bg-indigo-500/10 text-primary border border-primary/20 font-medium shadow-sm">
+                    <i class="fa-solid fa-user-gear w-5 text-center"></i> Usuarios
                 </a>
             </nav>
         </div>
         
         <div class="p-4 border-t border-slate-700/50">
-            <div class="bg-dark/50 rounded-lg p-3 flex items-center gap-3 mb-3 border border-slate-700/50">
-                <img src="https://ui-avatars.com/api/?name=Admin&background=4f46e5&color=fff" class="w-8 h-8 rounded-full">
-                <div class="overflow-hidden">
-                    <div class="text-white font-bold text-xs truncate">Administrador</div>
-                    <div class="text-emerald-400 text-[10px]">Online</div>
-                </div>
-            </div>
-            <button class="w-full flex items-center justify-center gap-2 p-2 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition text-xs font-bold uppercase tracking-wide border border-transparent hover:border-red-500/20">
-                <i class="fa-solid fa-power-off"></i> <span>Cerrar Sesión</span>
+            <button class="w-full flex items-center justify-center gap-2 p-2.5 rounded-lg text-danger hover:bg-danger/10 transition text-sm font-semibold">
+                <i class="fa-solid fa-power-off"></i> Salir
             </button>
         </div>
     </aside>
 
-    <main class="flex-1 p-8 overflow-y-auto relative z-10 bg-dark">
-        <div class="flex flex-col md:flex-row md:justify-between md:items-end mb-8 gap-4">
+    <main class="flex-1 flex flex-col h-full bg-dark relative z-10">
+        <header class="p-8 pb-0 flex justify-between items-end mb-8">
             <div>
                 <h2 class="text-3xl font-bold text-white tracking-tight">Gestión de Usuarios</h2>
-                <p class="text-slate-500 mt-1">Controla quién tiene acceso a la terminal POS y sus privilegios.</p>
+                <p class="text-slate-500 mt-1 text-sm">Administra roles y permisos del sistema POS.</p>
             </div>
-            <div class="flex gap-3">
-                <button onclick="app.refreshData()" class="bg-panel hover:bg-slate-700 text-slate-300 px-4 py-2.5 rounded-lg font-medium border border-slate-600 transition">
-                    <i class="fa-solid fa-rotate-right"></i>
-                </button>
-                <button onclick="app.openModal()" class="bg-primary hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-medium shadow-lg shadow-primary/25 transition flex items-center gap-2 active:scale-95">
-                    <i class="fa-solid fa-plus"></i> Agregar Usuario
-                </button>
+            <button onclick="app.modal(true)" class="bg-primary hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-bold shadow-lg shadow-indigo-500/20 transition flex items-center gap-2 active:scale-95">
+                <i class="fa-solid fa-plus"></i> Nuevo Usuario
+            </button>
+        </header>
+
+        <div class="px-8 pb-6 flex gap-4">
+            <div class="relative flex-1 max-w-md">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-500 text-sm"></i>
+                <input type="text" id="search" onkeyup="app.render()" placeholder="Buscar por nombre, usuario..." 
+                    class="w-full bg-panel border border-slate-700 rounded-lg py-2.5 pl-10 pr-4 text-white text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary transition placeholder-slate-600">
             </div>
+            <select id="filterRole" onchange="app.render()" class="bg-panel border border-slate-700 rounded-lg px-4 text-white text-sm outline-none focus:border-primary cursor-pointer">
+                <option value="">Todos los Roles</option>
+                <option value="ADMIN">Administradores</option>
+                <option value="CAJERO">Cajeros</option>
+                <option value="ALMACEN">Almacén</option>
+            </select>
         </div>
 
-        <div class="bg-panel p-4 rounded-xl border border-slate-700/50 mb-6 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-xl">
-            <div class="relative w-full sm:max-w-md">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-500"></i>
-                <input type="text" id="searchInput" onkeyup="app.filterUsers()" placeholder="Buscar por nombre, usuario o rol..." 
-                    class="bg-dark/50 w-full rounded-lg pl-10 pr-4 py-2.5 text-white border border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition placeholder-slate-600">
-            </div>
-            
-            <div class="flex gap-2 w-full sm:w-auto">
-                <select id="roleFilter" onchange="app.filterUsers()" class="bg-dark/50 text-slate-300 border border-slate-700 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-primary w-full sm:w-auto">
-                    <option value="">Todos los Roles</option>
-                    <option value="ADMIN">Administradores</option>
-                    <option value="CAJERO">Cajeros</option>
-                    <option value="ALMACEN">Almacén</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="bg-panel p-4 rounded-xl border border-slate-700/50 flex items-center gap-4">
-                <div class="p-3 bg-blue-500/10 text-blue-400 rounded-lg"><i class="fa-solid fa-users text-xl"></i></div>
-                <div><div class="text-slate-400 text-xs uppercase font-bold">Total Usuarios</div><div class="text-2xl font-bold text-white" id="stat-total">0</div></div>
-            </div>
-            <div class="bg-panel p-4 rounded-xl border border-slate-700/50 flex items-center gap-4">
-                <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg"><i class="fa-solid fa-user-check text-xl"></i></div>
-                <div><div class="text-slate-400 text-xs uppercase font-bold">Activos</div><div class="text-2xl font-bold text-white" id="stat-active">0</div></div>
-            </div>
-            <div class="bg-panel p-4 rounded-xl border border-slate-700/50 flex items-center gap-4">
-                <div class="p-3 bg-indigo-500/10 text-indigo-400 rounded-lg"><i class="fa-solid fa-shield-halved text-xl"></i></div>
-                <div><div class="text-slate-400 text-xs uppercase font-bold">Admins</div><div class="text-2xl font-bold text-white" id="stat-admin">0</div></div>
-            </div>
-        </div>
-
-        <div class="bg-panel rounded-xl border border-slate-700 shadow-2xl overflow-hidden relative min-h-[300px]">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-surface text-slate-400 uppercase text-xs sticky top-0 z-10">
-                        <tr>
-                            <th class="px-6 py-4 font-semibold tracking-wider">Usuario</th>
-                            <th class="px-6 py-4 font-semibold tracking-wider">Nombre Completo</th>
-                            <th class="px-6 py-4 font-semibold tracking-wider">Rol</th>
-                            <th class="px-6 py-4 font-semibold tracking-wider">Estado</th>
-                            <th class="px-6 py-4 font-semibold tracking-wider text-right">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="userTableBody" class="divide-y divide-slate-700/50 text-slate-300">
-                        </tbody>
-                </table>
-            </div>
-            <div id="emptyState" class="hidden absolute inset-0 flex flex-col items-center justify-center text-slate-500">
-                <i class="fa-solid fa-ghost text-4xl mb-3 opacity-50"></i>
-                <p>No se encontraron usuarios.</p>
+        <div class="flex-1 px-8 pb-8 overflow-hidden">
+            <div class="bg-panel rounded-xl border border-slate-700 shadow-xl h-full flex flex-col">
+                <div class="overflow-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-header text-slate-400 text-xs uppercase font-semibold sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th class="px-6 py-4">Usuario</th>
+                                <th class="px-6 py-4">Nombre Completo</th>
+                                <th class="px-6 py-4">Rol</th>
+                                <th class="px-6 py-4">Estado</th>
+                                <th class="px-6 py-4 text-right">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="divide-y divide-slate-700/50 text-sm">
+                            </tbody>
+                    </table>
+                    
+                    <div id="empty" class="hidden flex flex-col items-center justify-center h-64 text-slate-500">
+                        <div class="bg-dark p-4 rounded-full mb-3"><i class="fa-solid fa-ghost text-3xl opacity-50"></i></div>
+                        <p>No se encontraron resultados.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
 
-    <div id="userModal" class="modal-enter fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm transition-all duration-200">
-        <div class="bg-panel w-full max-w-lg rounded-xl border border-slate-700 shadow-2xl transform transition-all scale-100 m-4">
-            
-            <div class="flex justify-between items-center p-6 border-b border-slate-700/50">
-                <h3 class="text-xl font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-user-pen text-primary"></i> <span id="modalTitle">Nuevo Usuario</span>
-                </h3>
-                <button onclick="app.closeModal()" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+    <div id="modalOverlay" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-panel w-full max-w-md rounded-xl border border-slate-600 shadow-2xl fade-in">
+            <div class="px-6 py-5 border-b border-slate-700 flex justify-between items-center bg-header/50 rounded-t-xl">
+                <h3 id="modalTitle" class="text-white font-bold text-lg">Nuevo Usuario</h3>
+                <button onclick="app.modal(false)" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-
-            <form id="userForm" onsubmit="app.saveUser(event)" class="p-6 space-y-5">
-                <input type="hidden" id="userId">
+            
+            <form onsubmit="app.save(event)" class="p-6 space-y-4">
+                <input type="hidden" id="uid">
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Usuario (Login)</label>
-                        <input type="text" id="username" required class="w-full bg-dark border border-slate-600 rounded-lg p-2.5 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition" placeholder="ej. cajero1">
+                        <label class="block text-xs font-bold text-slate-400 uppercase mb-1.5">Usuario</label>
+                        <input type="text" id="uUser" required class="w-full bg-dark border border-slate-600 rounded-lg p-2.5 text-white outline-none focus:border-primary transition">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Rol de Acceso</label>
-                        <select id="role" class="w-full bg-dark border border-slate-600 rounded-lg p-2.5 text-white focus:border-primary outline-none">
-                            <option value="CAJERO">Cajero (Punto de Venta)</option>
-                            <option value="ADMIN">Administrador Total</option>
-                            <option value="ALMACEN">Jefe de Almacén</option>
+                        <label class="block text-xs font-bold text-slate-400 uppercase mb-1.5">Rol</label>
+                        <select id="uRole" class="w-full bg-dark border border-slate-600 rounded-lg p-2.5 text-white outline-none focus:border-primary transition">
+                            <option value="CAJERO">Cajero</option>
+                            <option value="ADMIN">Admin</option>
+                            <option value="ALMACEN">Almacén</option>
                         </select>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Nombre Completo</label>
-                    <input type="text" id="fullname" required class="w-full bg-dark border border-slate-600 rounded-lg p-2.5 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition" placeholder="ej. Roberto Gómez Bolaños">
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1.5">Nombre Completo</label>
+                    <input type="text" id="uName" required class="w-full bg-dark border border-slate-600 rounded-lg p-2.5 text-white outline-none focus:border-primary transition">
                 </div>
 
-                <div class="flex items-center gap-3 bg-dark/50 p-3 rounded-lg border border-slate-700">
-                    <div class="flex items-center h-5">
-                        <input id="isActive" type="checkbox" checked class="w-4 h-4 text-primary bg-slate-700 border-slate-600 rounded focus:ring-primary focus:ring-2">
-                    </div>
-                    <div class="text-sm">
-                        <label for="isActive" class="font-medium text-slate-300">Usuario Activo</label>
-                        <p class="text-xs text-slate-500">Si se desactiva, no podrá ingresar al sistema.</p>
-                    </div>
+                <div class="bg-dark/50 p-3 rounded-lg border border-slate-700/50 flex items-center gap-3 cursor-pointer" onclick="document.getElementById('uActive').click()">
+                    <input type="checkbox" id="uActive" class="w-4 h-4 text-primary rounded bg-panel border-slate-600 focus:ring-offset-0 focus:ring-0">
+                    <span class="text-sm font-medium text-white">Usuario Activo</span>
                 </div>
 
-                <div class="pt-4 flex gap-3">
-                    <button type="button" onclick="app.closeModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-medium py-2.5 rounded-lg transition">Cancelar</button>
-                    <button type="submit" class="flex-1 bg-primary hover:bg-indigo-500 text-white font-bold py-2.5 rounded-lg shadow-lg shadow-primary/25 transition">Guardar Datos</button>
+                <div class="pt-2 flex gap-3">
+                    <button type="button" onclick="app.modal(false)" class="flex-1 bg-slate-700 text-white py-2.5 rounded-lg hover:bg-slate-600 transition font-medium">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-primary text-white py-2.5 rounded-lg hover:bg-indigo-500 transition font-bold shadow-lg shadow-indigo-500/20">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="toast-container"></div>
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-[60] flex flex-col gap-2 pointer-events-none"></div>
 
     <script>
         const app = {
             data: [],
             
             init() {
-                // 1. Cargar datos del LocalStorage o usar datos dummy iniciales
-                const storedData = localStorage.getItem('cocolandia_users');
-                if (storedData) {
-                    this.data = JSON.parse(storedData);
+                const db = localStorage.getItem('cocolandia_v600');
+                if (db) {
+                    this.data = JSON.parse(db);
                 } else {
-                    // Datos de prueba si está vacío
                     this.data = [
-                        { id: 1, username: 'admin', fullname: 'Administrador Principal', role: 'ADMIN', active: true },
-                        { id: 2, username: 'cajero01', fullname: 'Juan Pérez', role: 'CAJERO', active: true },
-                        { id: 3, username: 'almacen', fullname: 'Laura Torres', role: 'ALMACEN', active: false }
+                        { id: 1, user: 'admin', name: 'Administrador', role: 'ADMIN', active: true },
+                        { id: 2, user: 'cajero1', name: 'Roberto Gómez', role: 'CAJERO', active: true },
+                        { id: 3, user: 'bodega', name: 'Laura Torres', role: 'ALMACEN', active: false }
                     ];
-                    this.saveToDisk();
+                    this.persist();
                 }
-                this.renderTable();
-                this.updateStats();
+                this.render();
             },
 
-            saveToDisk() {
-                localStorage.setItem('cocolandia_users', JSON.stringify(this.data));
-                this.updateStats();
+            persist() {
+                localStorage.setItem('cocolandia_v600', JSON.stringify(this.data));
             },
 
-            // --- RENDERIZADO ---
-            renderTable(filterText = '', filterRole = '') {
-                const tbody = document.getElementById('userTableBody');
-                const emptyState = document.getElementById('emptyState');
+            // --- UI ---
+            render() {
+                const text = document.getElementById('search').value.toLowerCase();
+                const roleFilter = document.getElementById('filterRole').value;
+                const tbody = document.getElementById('tableBody');
+                
                 tbody.innerHTML = '';
 
-                let filtered = this.data.filter(u => {
-                    const matchText = u.username.toLowerCase().includes(filterText) || u.fullname.toLowerCase().includes(filterText);
-                    const matchRole = filterRole === '' || u.role === filterRole;
+                const list = this.data.filter(u => {
+                    const matchText = u.user.toLowerCase().includes(text) || u.name.toLowerCase().includes(text);
+                    const matchRole = roleFilter === '' || u.role === roleFilter;
                     return matchText && matchRole;
                 });
 
-                if (filtered.length === 0) {
-                    emptyState.classList.remove('hidden');
+                if (list.length === 0) {
+                    document.getElementById('empty').classList.remove('hidden');
                 } else {
-                    emptyState.classList.add('hidden');
+                    document.getElementById('empty').classList.add('hidden');
                     
-                    filtered.forEach(user => {
-                        const row = document.createElement('tr');
-                        row.className = 'hover:bg-slate-700/30 transition group border-b border-slate-700/50 last:border-0';
-                        
-                        // Icono según rol
-                        let icon = 'fa-user';
-                        let colorClass = 'bg-slate-700 text-slate-400';
-                        if(user.role === 'ADMIN') { icon = 'fa-crown'; colorClass = 'bg-indigo-500/20 text-indigo-400'; }
-                        if(user.role === 'ALMACEN') { icon = 'fa-box'; colorClass = 'bg-orange-500/20 text-orange-400'; }
+                    list.forEach(u => {
+                        // Badge Styles
+                        let badge = "bg-slate-700 text-slate-300";
+                        if(u.role === 'ADMIN') badge = "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20";
+                        if(u.role === 'ALMACEN') badge = "bg-orange-500/10 text-orange-400 border border-orange-500/20";
 
-                        // Badges
-                        const roleBadge = user.role === 'ADMIN' 
-                            ? `<span class="bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded text-[10px] font-bold border border-indigo-500/20 tracking-wider">ADMIN</span>`
-                            : `<span class="bg-slate-700/50 text-slate-300 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-600 tracking-wider">${user.role}</span>`;
+                        // Status
+                        const status = u.active 
+                            ? `<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/10"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> ACTIVO</span>`
+                            : `<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-slate-700/50 text-slate-500 text-xs font-bold"><span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> INACTIVO</span>`;
 
-                        const statusBadge = user.active
-                            ? `<span class="flex items-center gap-1.5 text-emerald-400 text-xs font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></span> Activo</span>`
-                            : `<span class="flex items-center gap-1.5 text-slate-500 text-xs font-bold"><span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span> Inactivo</span>`;
+                        // Avatar Initials
+                        const initials = u.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+                        const avatarColor = u.role === 'ADMIN' ? 'bg-indigo-600' : 'bg-slate-600';
 
-                        row.innerHTML = `
-                            <td class="px-6 py-4 font-medium text-white">
+                        const tr = document.createElement('tr');
+                        tr.className = "hover:bg-slate-700/30 transition group border-b border-slate-700/50 last:border-0";
+                        tr.innerHTML = `
+                            <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-full ${colorClass} flex items-center justify-center shadow-inner"><i class="fa-solid ${icon}"></i></div>
-                                    <span class="font-mono text-sm">${user.username}</span>
+                                    <div class="w-9 h-9 rounded-lg ${avatarColor} flex items-center justify-center text-white text-xs font-bold shadow-md">${initials}</div>
+                                    <div>
+                                        <div class="font-bold text-white text-sm">${u.user}</div>
+                                        <div class="text-[10px] text-slate-500">ID: ${u.id}</div>
+                                    </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">${user.fullname}</td>
-                            <td class="px-6 py-4">${roleBadge}</td>
-                            <td class="px-6 py-4">${statusBadge}</td>
+                            <td class="px-6 py-4 text-slate-300">${u.name}</td>
+                            <td class="px-6 py-4"><span class="px-2 py-1 rounded text-[10px] font-bold tracking-wider ${badge}">${u.role}</span></td>
+                            <td class="px-6 py-4">${status}</td>
                             <td class="px-6 py-4 text-right">
-                                <div class="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end gap-2">
-                                    <button onclick="app.editUser(${user.id})" class="p-2 text-slate-400 hover:text-white hover:bg-slate-600 rounded-lg transition" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button onclick="app.deleteUser(${user.id})" class="p-2 text-slate-400 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                                </div>
+                                <button onclick="app.edit(${u.id})" class="text-slate-400 hover:text-white hover:bg-slate-600 p-2 rounded transition mr-1"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="app.del(${u.id})" class="text-slate-400 hover:text-danger hover:bg-red-500/10 p-2 rounded transition"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         `;
-                        tbody.appendChild(row);
+                        tbody.appendChild(tr);
                     });
                 }
             },
 
-            updateStats() {
-                document.getElementById('stat-total').innerText = this.data.length;
-                document.getElementById('stat-active').innerText = this.data.filter(u => u.active).length;
-                document.getElementById('stat-admin').innerText = this.data.filter(u => u.role === 'ADMIN').length;
-            },
-
-            filterUsers() {
-                const text = document.getElementById('searchInput').value.toLowerCase();
-                const role = document.getElementById('roleFilter').value;
-                this.renderTable(text, role);
-            },
-
-            // --- MODAL Y CRUD ---
-            openModal(editId = null) {
-                const modal = document.getElementById('userModal');
-                const title = document.getElementById('modalTitle');
-                const form = document.getElementById('userForm');
-                
-                modal.classList.remove('modal-enter');
-                modal.classList.add('modal-active');
-                
-                if (editId) {
-                    const user = this.data.find(u => u.id === editId);
-                    title.innerText = "Editar Usuario";
-                    document.getElementById('userId').value = user.id;
-                    document.getElementById('username').value = user.username;
-                    document.getElementById('fullname').value = user.fullname;
-                    document.getElementById('role').value = user.role;
-                    document.getElementById('isActive').checked = user.active;
+            // --- CRUD ---
+            modal(show) {
+                const el = document.getElementById('modalOverlay');
+                if (show) {
+                    el.classList.remove('hidden');
+                    document.getElementById('uid').value = '';
+                    document.getElementById('uUser').value = '';
+                    document.getElementById('uName').value = '';
+                    document.getElementById('uActive').checked = true;
+                    document.getElementById('modalTitle').innerText = 'Nuevo Usuario';
                 } else {
-                    title.innerText = "Nuevo Usuario";
-                    form.reset();
-                    document.getElementById('userId').value = '';
+                    el.classList.add('hidden');
                 }
             },
 
-            closeModal() {
-                const modal = document.getElementById('userModal');
-                modal.classList.remove('modal-active');
-                modal.classList.add('modal-enter');
+            edit(id) {
+                const u = this.data.find(x => x.id === id);
+                if(u) {
+                    this.modal(true);
+                    document.getElementById('modalTitle').innerText = 'Editar Usuario';
+                    document.getElementById('uid').value = u.id;
+                    document.getElementById('uUser').value = u.user;
+                    document.getElementById('uName').value = u.name;
+                    document.getElementById('uRole').value = u.role;
+                    document.getElementById('uActive').checked = u.active;
+                }
             },
 
-            saveUser(e) {
+            save(e) {
                 e.preventDefault();
-                const id = document.getElementById('userId').value;
-                const username = document.getElementById('username').value;
-                const fullname = document.getElementById('fullname').value;
-                const role = document.getElementById('role').value;
-                const active = document.getElementById('isActive').checked;
+                const id = document.getElementById('uid').value;
+                const user = {
+                    id: id ? parseInt(id) : (this.data.length ? Math.max(...this.data.map(u => u.id)) + 1 : 101),
+                    user: document.getElementById('uUser').value,
+                    name: document.getElementById('uName').value,
+                    role: document.getElementById('uRole').value,
+                    active: document.getElementById('uActive').checked
+                };
 
                 if (id) {
-                    // Editar existente
-                    const index = this.data.findIndex(u => u.id == id);
-                    this.data[index] = { id: parseInt(id), username, fullname, role, active };
-                    this.showToast('Usuario actualizado correctamente', 'success');
+                    const idx = this.data.findIndex(x => x.id == id);
+                    if(idx !== -1) this.data[idx] = user;
+                    this.toast('Usuario actualizado correctamente', 'success');
                 } else {
-                    // Crear nuevo
-                    const newId = this.data.length > 0 ? Math.max(...this.data.map(u => u.id)) + 1 : 1;
-                    this.data.push({ id: newId, username, fullname, role, active });
-                    this.showToast('Usuario creado exitosamente', 'success');
+                    this.data.push(user);
+                    this.toast('Nuevo usuario creado', 'success');
                 }
-
-                this.saveToDisk();
-                this.renderTable();
-                this.closeModal();
-                this.filterUsers(); // Re-aplicar filtros si existen
+                
+                this.persist();
+                this.render();
+                this.modal(false);
             },
 
-            deleteUser(id) {
-                if(confirm('¿Estás seguro de eliminar este usuario? Esta acción no se puede deshacer.')) {
+            del(id) {
+                if(confirm('¿Eliminar usuario del sistema?')) {
                     this.data = this.data.filter(u => u.id !== id);
-                    this.saveToDisk();
-                    this.renderTable();
-                    this.filterUsers();
-                    this.showToast('Usuario eliminado', 'error');
+                    this.persist();
+                    this.render();
+                    this.toast('Usuario eliminado', 'danger');
                 }
             },
 
-            refreshData() {
-                const icon = document.querySelector('.fa-rotate-right');
-                icon.classList.add('fa-spin');
+            // --- NOTIFICACIONES ---
+            toast(msg, type = 'success') {
+                const container = document.getElementById('toastContainer');
+                const div = document.createElement('div');
+                const colors = type === 'success' ? 'bg-emerald-600' : 'bg-red-600';
+                const icon = type === 'success' ? 'fa-check' : 'fa-trash';
+                
+                div.className = `toast flex items-center gap-3 ${colors} text-white px-4 py-3 rounded-lg shadow-xl min-w-[300px] border border-white/10`;
+                div.innerHTML = `<i class="fa-solid ${icon}"></i> <span class="font-medium text-sm">${msg}</span>`;
+                
+                container.appendChild(div);
+                
+                // Trigger animation
+                requestAnimationFrame(() => div.classList.add('show'));
+                
                 setTimeout(() => {
-                    this.init(); // Recargar
-                    this.filterUsers();
-                    icon.classList.remove('fa-spin');
-                    this.showToast('Datos actualizados', 'info');
-                }, 500);
-            },
-
-            // --- UTILIDADES ---
-            showToast(msg, type = 'info') {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                
-                let bg = 'bg-slate-700';
-                let icon = 'fa-info-circle';
-                if(type === 'success') { bg = 'bg-emerald-600'; icon = 'fa-check-circle'; }
-                if(type === 'error') { bg = 'bg-red-600'; icon = 'fa-triangle-exclamation'; }
-
-                toast.className = `toast mb-3 p-4 rounded-lg shadow-lg flex items-center gap-3 text-white min-w-[300px] ${bg}`;
-                toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span class="font-medium">${msg}</span>`;
-                
-                container.appendChild(toast);
-                
-                // Animación entrada
-                requestAnimationFrame(() => { toast.classList.add('show'); });
-
-                // Remover después de 3s
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                    setTimeout(() => toast.remove(), 300);
+                    div.classList.remove('show');
+                    setTimeout(() => div.remove(), 300);
                 }, 3000);
             }
         };
