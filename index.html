@@ -3,21 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cocolandia v5.6 - Configuración Pro</title>
+    <title>Cocolandia v5.8 - Completo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = { darkMode: 'class' }
+        tailwind.config = {
+            darkMode: 'class',
+        }
     </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        /* Estilos de la barra de desplazamiento */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        
+        /* Animaciones */
         .fade-in { animation: fadeIn 0.3s ease-in; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         
-        /* Switch Toggle */
+        /* Estilos del Switch (Interruptor) */
         .toggle-checkbox:checked { right: 0; border-color: #68D391; }
         .toggle-checkbox:checked + .toggle-label { background-color: #68D391; }
         
@@ -34,7 +39,7 @@
                     <i class="fas fa-store"></i>
                 </div>
                 <h1 class="text-4xl font-black text-slate-800 dark:text-white tracking-tight">Cocolandia</h1>
-                <p class="text-slate-500 dark:text-slate-400 font-medium">Punto de Venta v5.6</p>
+                <p class="text-slate-500 dark:text-slate-400 font-medium">Versión 5.8</p>
             </div>
             
             <form onsubmit="login(event)" class="space-y-5 text-left">
@@ -62,15 +67,24 @@
     <div id="screen-app" class="hidden h-full flex">
         
         <aside class="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col z-10 shadow-sm transition-colors duration-300">
-            <div class="p-6 flex items-center space-x-3 border-b border-slate-100 dark:border-slate-700">
-                <div class="bg-indigo-600 text-white p-2 rounded-lg">
-                    <i class="fas fa-store text-xl"></i>
+            
+            <div class="p-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-700">
+                <div class="flex items-center gap-2">
+                    <button onclick="modalAjustes()" class="p-2 -ml-2 text-slate-600 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-white transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    
+                    <div class="bg-indigo-600 text-white w-8 h-8 flex items-center justify-center rounded-lg shadow-sm">
+                        <i class="fas fa-store text-xs"></i>
+                    </div>
+
+                    <h1 class="text-base font-bold tracking-tight dark:text-white">Cocolandia</h1>
                 </div>
-                <div class="overflow-hidden">
-                    <h1 class="text-lg font-bold tracking-tight truncate dark:text-white">Cocolandia</h1>
-                    <div class="flex items-center text-xs text-green-600 dark:text-green-400 font-bold">
-                        <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-                        <span id="user-display-name" class="truncate">USUARIO</span>
+
+                <div class="flex flex-col items-end">
+                     <div class="flex items-center text-[9px] text-green-600 dark:text-green-400 font-bold uppercase bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">
+                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1 animate-pulse"></span>
+                        <span id="user-display-name" class="truncate max-w-[60px]">USER</span>
                     </div>
                 </div>
             </div>
@@ -98,10 +112,6 @@
             </nav>
 
             <div class="p-4 border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 space-y-2">
-                <button onclick="modalAjustes()" class="w-full flex items-center justify-center p-3 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-sm transition-all border border-slate-300 dark:border-slate-600">
-                    <i class="fas fa-cog mr-2"></i> Configuración
-                </button>
-
                 <button onclick="prepararCierreCaja()" class="w-full flex items-center justify-center p-3 rounded-xl text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 font-bold text-sm transition-all border border-indigo-200 dark:border-indigo-800">
                     <i class="fas fa-file-invoice-dollar mr-2"></i> Cierre de Caja
                 </button>
@@ -121,6 +131,7 @@
                     </div>
                     <div id="grid-productos" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 pb-20"></div>
                 </div>
+                
                 <div class="w-96 bg-white dark:bg-slate-800 shadow-2xl border-l border-slate-200 dark:border-slate-700 flex flex-col z-30 transition-colors duration-300">
                     <div class="p-4 bg-indigo-50 dark:bg-slate-700/50 border-b border-indigo-100 dark:border-slate-700">
                         <div class="flex justify-between items-center mb-2">
@@ -138,11 +149,13 @@
                             <div class="text-xs text-slate-500 dark:text-slate-400">ID: <span id="lbl-cli-id">---</span></div>
                         </div>
                     </div>
+                    
                     <div class="p-3 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex justify-between items-center">
                         <h2 class="font-bold text-sm text-slate-700 dark:text-slate-300">Carrito</h2>
                         <span class="text-xs text-slate-400" id="cart-count">0 items</span>
                     </div>
                     <div id="cart-list" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+                    
                     <div class="p-5 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700">
                         <div class="flex justify-between items-end mb-4">
                             <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Total</span>
@@ -162,14 +175,40 @@
                 <h2 class="text-3xl font-bold mb-8 dark:text-white">Usuarios</h2>
                 <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border dark:border-slate-700 overflow-hidden">
                     <table class="w-full text-left">
-                        <thead class="bg-slate-50 dark:bg-slate-700/50 border-b dark:border-slate-700"><tr><th class="p-4 dark:text-slate-300">Usuario</th><th class="p-4 dark:text-slate-300">Nombre</th><th class="p-4 dark:text-slate-300">Rol</th></tr></thead>
+                        <thead class="bg-slate-50 dark:bg-slate-700/50 border-b dark:border-slate-700">
+                            <tr>
+                                <th class="p-4 dark:text-slate-300">Usuario</th>
+                                <th class="p-4 dark:text-slate-300">Nombre</th>
+                                <th class="p-4 dark:text-slate-300">Rol</th>
+                            </tr>
+                        </thead>
                         <tbody id="table-users" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
                     </table>
                 </div>
             </div>
-            <div id="view-ventas" class="view-section hidden flex-1 p-8 overflow-y-auto"><h2 class="text-2xl font-bold mb-6 dark:text-white">Historial</h2><div id="list-ventas" class="space-y-2"></div></div>
-            <div id="view-clientes" class="view-section hidden flex-1 p-8 overflow-y-auto"><h2 class="text-2xl font-bold mb-6 dark:text-white">Clientes</h2><div class="bg-white dark:bg-slate-800 rounded-xl shadow overflow-hidden border dark:border-slate-700"><table class="w-full text-left"><tbody id="table-clientes" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody></table></div></div>
-            <div id="view-inventario" class="view-section hidden flex-1 p-8 overflow-y-auto"><h2 class="text-2xl font-bold mb-6 dark:text-white">Inventario</h2><div class="bg-white dark:bg-slate-800 rounded-xl shadow overflow-hidden border dark:border-slate-700"><table class="w-full text-left"><tbody id="table-inv" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody></table></div></div>
+            
+            <div id="view-ventas" class="view-section hidden flex-1 p-8 overflow-y-auto">
+                <h2 class="text-2xl font-bold mb-6 dark:text-white">Historial</h2>
+                <div id="list-ventas" class="space-y-2"></div>
+            </div>
+            
+            <div id="view-clientes" class="view-section hidden flex-1 p-8 overflow-y-auto">
+                <h2 class="text-2xl font-bold mb-6 dark:text-white">Clientes</h2>
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow overflow-hidden border dark:border-slate-700">
+                    <table class="w-full text-left">
+                        <tbody id="table-clientes" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="view-inventario" class="view-section hidden flex-1 p-8 overflow-y-auto">
+                <h2 class="text-2xl font-bold mb-6 dark:text-white">Inventario</h2>
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow overflow-hidden border dark:border-slate-700">
+                    <table class="w-full text-left">
+                        <tbody id="table-inv" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
+                    </table>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -177,52 +216,55 @@
         <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border dark:border-slate-700 transform transition-all animate-fade-in">
             <div class="p-6 bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    <div class="bg-indigo-600 p-2 rounded-lg text-white"><i class="fas fa-cog"></i></div>
+                    <div class="bg-indigo-600 p-2 rounded-lg text-white">
+                        <i class="fas fa-cog"></i>
+                    </div>
                     <div>
                         <h2 class="text-xl font-bold text-slate-800 dark:text-white">Configuración</h2>
-                        <p class="text-xs text-slate-500">Ajustes del Sistema POS</p>
+                        <p class="text-xs text-slate-500">Ajustes del Sistema</p>
                     </div>
                 </div>
-                <button onclick="document.getElementById('modal-ajustes').classList.add('hidden')" class="text-slate-400 hover:text-red-500 transition-colors"><i class="fas fa-times text-xl"></i></button>
+                <button onclick="document.getElementById('modal-ajustes').classList.add('hidden')" class="text-slate-400 hover:text-red-500">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
-            
             <div class="p-6 space-y-6">
-                
                 <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-600">
                     <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-slate-600 dark:text-white"><i class="fas fa-moon"></i></div>
+                        <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-slate-600 dark:text-white">
+                            <i class="fas fa-moon"></i>
+                        </div>
                         <div>
                             <div class="font-bold text-slate-800 dark:text-white">Modo Oscuro</div>
-                            <div class="text-xs text-slate-500 dark:text-slate-400">Interfaz de alto contraste</div>
+                            <div class="text-xs text-slate-500 dark:text-slate-400">Interfaz oscura</div>
                         </div>
                     </div>
-                    <div class="relative inline-block w-12 mr-2 align-middle select-none">
+                    <div class="relative inline-block w-12 mr-2">
                         <input type="checkbox" id="toggle-theme" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300" onclick="toggleTheme()"/>
                         <label for="toggle-theme" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 cursor-pointer transition-colors duration-300"></label>
                     </div>
                 </div>
-
+                
                 <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-600">
                     <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center"><i class="fas fa-download"></i></div>
+                        <div class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+                            <i class="fas fa-download"></i>
+                        </div>
                         <div>
-                            <div class="font-bold text-slate-800 dark:text-white">Respaldar Datos</div>
-                            <div class="text-xs text-slate-500 dark:text-slate-400">Descargar JSON de seguridad</div>
+                            <div class="font-bold text-slate-800 dark:text-white">Respaldar</div>
+                            <div class="text-xs text-slate-500 dark:text-slate-400">Descargar datos</div>
                         </div>
                     </div>
-                    <button onclick="backupData()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-bold rounded-lg shadow-sm">DESCARGAR</button>
-                </div>
-
-                <div class="border-t dark:border-slate-700 pt-4">
-                    <p class="text-xs font-bold text-red-400 uppercase mb-3 ml-1">Zona de Peligro</p>
-                    <button onclick="resetFactory()" class="w-full flex items-center justify-between p-4 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-xl border border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 transition-colors">
-                        <span class="font-bold text-sm"><i class="fas fa-trash-alt mr-2"></i> Borrar Todo (Reset)</span>
-                        <i class="fas fa-chevron-right text-xs"></i>
+                    <button onclick="backupData()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-bold rounded-lg shadow-sm">
+                        DESCARGAR
                     </button>
                 </div>
-
-                <div class="text-center text-[10px] text-slate-400">
-                    Cocolandia POS v5.6 &copy; 2025
+                
+                <div class="border-t dark:border-slate-700 pt-4">
+                    <button onclick="resetFactory()" class="w-full flex items-center justify-between p-4 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-xl border border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 transition-colors">
+                        <span class="font-bold text-sm"><i class="fas fa-trash-alt mr-2"></i> Borrar Todo</span>
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -255,11 +297,12 @@
             save: (key, data) => localStorage.setItem(key, JSON.stringify(data))
         };
 
+        // --- ESTADO GLOBAL ---
         let carrito = [];
         let clienteActivo = null;
         let currentUser = null;
 
-        // --- INICIO DE APP ---
+        // --- INICIALIZACIÓN ---
         (function initTheme() {
             const saved = localStorage.getItem('coco_theme');
             if(saved === 'dark') {
@@ -268,8 +311,10 @@
             }
         })();
 
-        // --- LOGICA DE AJUSTES ---
-        function modalAjustes() { document.getElementById('modal-ajustes').classList.remove('hidden'); }
+        // --- FUNCIONES DE INTERFAZ Y AJUSTES ---
+        function modalAjustes() {
+            document.getElementById('modal-ajustes').classList.remove('hidden');
+        }
         
         function toggleTheme() {
             const html = document.documentElement;
@@ -288,37 +333,41 @@
             const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'Respaldo_Cocolandia_' + Date.now() + '.json';
+            a.download = 'Cocolandia_Respaldo_' + Date.now() + '.json';
             a.click();
             alert("Respaldo descargado correctamente.");
         }
 
         function resetFactory() {
-            if(confirm("PELIGRO: ¿Estás seguro de borrar TODOS los productos, clientes y ventas? Esto no se puede deshacer.")) {
-                if(confirm("Confirmación final: ¿Realmente quieres borrar todo?")) {
+            if(confirm("¡ADVERTENCIA!\n\n¿Estás seguro de borrar TODOS los productos, clientes y ventas?\nEsta acción no se puede deshacer.")) {
+                if(confirm("¿Confirmas que quieres borrar todo?")) {
                     localStorage.clear();
                     location.reload();
                 }
             }
         }
 
-        // --- LOGIN ---
+        // --- LOGIN Y SESIÓN ---
         function login(e) {
             e.preventDefault();
             const u = document.getElementById('login-user').value;
             const p = document.getElementById('login-pass').value;
             const found = DB.users().find(x => x.user === u && x.pass === p);
+
             if (found) {
                 currentUser = {...found, inicioTurno: new Date()};
                 document.getElementById('screen-login').classList.add('hidden');
                 document.getElementById('screen-app').classList.remove('hidden');
                 document.getElementById('user-display-name').textContent = found.name.toUpperCase();
+                
                 if(currentUser.role === 'admin') document.getElementById('menu-admin-users').classList.remove('hidden');
                 nav('pos'); renderPos(); renderCliTable(); renderHist(); renderUsersTable();
-            } else { alert("Datos incorrectos"); }
+            } else { alert("Usuario o clave incorrectos"); }
         }
 
-        function logout() { location.reload(); }
+        function logout() {
+            location.reload();
+        }
 
         function nav(vista) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
@@ -328,14 +377,17 @@
             if(active) active.className = 'nav-btn w-full flex items-center p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 font-bold';
         }
 
-        // --- POS ---
+        // --- PUNTO DE VENTA (POS) ---
         function renderPos(f='') {
             const grid = document.getElementById('grid-productos'); grid.innerHTML = '';
             DB.inv().filter(p => p.nombre.toLowerCase().includes(f.toLowerCase()) || p.id.includes(f)).forEach(p => {
                 grid.innerHTML += `
                     <div onclick="addCarro('${p.id}')" class="bg-white dark:bg-slate-800 p-4 rounded-xl border dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 cursor-pointer shadow-sm ${p.stock<=0?'opacity-50 grayscale':''}">
                         <h3 class="font-bold text-slate-800 dark:text-white text-sm mb-3 h-10 overflow-hidden">${p.nombre}</h3>
-                        <div class="flex justify-between items-end"><span class="text-xl font-black text-indigo-600 dark:text-indigo-400">$${p.precio}</span><span class="text-[10px] text-slate-400 font-bold">STOCK: ${p.stock}</span></div>
+                        <div class="flex justify-between items-end">
+                            <span class="text-xl font-black text-indigo-600 dark:text-indigo-400">$${p.precio}</span>
+                            <span class="text-[10px] text-slate-400 font-bold">STOCK: ${p.stock}</span>
+                        </div>
                     </div>`;
             });
         }
@@ -343,7 +395,7 @@
         function addCarro(id) {
             const p = DB.inv().find(x => x.id === id); if(!p || p.stock <= 0) return alert("Agotado");
             const item = carrito.find(x => x.id === id);
-            if(item) { if(item.cant < p.stock) item.cant++; else alert("Sin stock"); } else carrito.push({...p, cant: 1});
+            if(item) { if(item.cant < p.stock) item.cant++; else alert("Sin stock suficiente"); } else carrito.push({...p, cant: 1});
             renderCart();
         }
 
@@ -351,10 +403,17 @@
             const list = document.getElementById('cart-list'); list.innerHTML = ''; let total = 0;
             carrito.forEach((p, i) => {
                 total += p.precio * p.cant;
-                list.innerHTML += `<div class="flex justify-between items-center bg-slate-50 dark:bg-slate-700 p-2 rounded border dark:border-slate-600 text-xs">
-                    <div><b class="dark:text-white">${p.nombre}</b><br><span class="text-slate-500 dark:text-slate-400">$${p.precio} x ${p.cant}</span></div>
-                    <div class="flex items-center gap-1"><button onclick="modCart(${i},-1)" class="w-6 h-6 bg-white dark:bg-slate-600 dark:text-white rounded shadow">-</button><button onclick="modCart(${i},1)" class="w-6 h-6 bg-indigo-100 dark:bg-indigo-900 dark:text-indigo-300 rounded shadow">+</button></div>
-                </div>`;
+                list.innerHTML += `
+                    <div class="flex justify-between items-center bg-slate-50 dark:bg-slate-700 p-2 rounded border dark:border-slate-600 text-xs">
+                        <div>
+                            <b class="dark:text-white">${p.nombre}</b><br>
+                            <span class="text-slate-500 dark:text-slate-400">$${p.precio} x ${p.cant}</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="modCart(${i},-1)" class="w-6 h-6 bg-white dark:bg-slate-600 dark:text-white rounded shadow">-</button>
+                            <button onclick="modCart(${i},1)" class="w-6 h-6 bg-indigo-100 dark:bg-indigo-900 dark:text-indigo-300 rounded shadow">+</button>
+                        </div>
+                    </div>`;
             });
             document.getElementById('lbl-total').textContent = '$' + total.toFixed(2);
             document.getElementById('cart-count').textContent = carrito.length + ' items';
@@ -369,6 +428,7 @@
 
         function cobrar(metodo) {
             const total = carrito.reduce((s,i)=>s+(i.precio*i.cant),0); if(total <= 0) return;
+            
             if(metodo === 'puntos') {
                 const clis = DB.cli(); const idx = clis.findIndex(c => c.id === clienteActivo.id);
                 if(clis[idx].puntos < total) return alert("Puntos insuficientes");
@@ -377,31 +437,63 @@
             } else {
                 const pago = parseFloat(document.getElementById('input-pago').value);
                 if(!pago || pago < total) return alert("Pago insuficiente");
-                let pts = 0; if(clienteActivo) { const clis = DB.cli(); const idx = clis.findIndex(c => c.id === clienteActivo.id); pts = Math.floor(total/10); clis[idx].puntos += pts; DB.save('coco_clientes', clis); }
+                
+                let pts = 0; 
+                if(clienteActivo) { 
+                    const clis = DB.cli(); const idx = clis.findIndex(c => c.id === clienteActivo.id); 
+                    pts = Math.floor(total/10); 
+                    clis[idx].puntos += pts; 
+                    DB.save('coco_clientes', clis); 
+                }
                 saveVenta(total, 'Efectivo', pts, clienteActivo ? clienteActivo.id : 'General');
             }
-            alert("Venta Exitosa"); carrito = []; quitarCliente(); document.getElementById('input-pago').value = ''; renderCart(); renderPos();
+            
+            alert("Venta Exitosa"); 
+            carrito = []; quitarCliente(); 
+            document.getElementById('input-pago').value = ''; 
+            renderCart(); renderPos();
         }
 
         function saveVenta(total, metodo, pts, cliId) {
-            const inv = DB.inv(); carrito.forEach(item => { const p = inv.find(x => x.id === item.id); if(p) p.stock -= item.cant; });
+            const inv = DB.inv(); 
+            carrito.forEach(item => { 
+                const p = inv.find(x => x.id === item.id); 
+                if(p) p.stock -= item.cant; 
+            });
             DB.save('coco_inv', inv);
-            const ven = DB.ven(); ven.unshift({ id: Date.now(), fecha: new Date().toLocaleString(), fechaRaw: new Date(), total, metodo, puntos: pts, vendedor: currentUser.user, cliente: cliId });
+            
+            const ven = DB.ven(); 
+            ven.unshift({ 
+                id: Date.now(), 
+                fecha: new Date().toLocaleString(), 
+                total, metodo, puntos: pts, 
+                vendedor: currentUser.user, 
+                cliente: cliId 
+            });
             DB.save('coco_ven', ven);
         }
 
         function calcCambio() {
-            const total = carrito.reduce((s,i)=>s+(i.precio*i.cant),0); const pago = parseFloat(document.getElementById('input-pago').value);
+            const total = carrito.reduce((s,i)=>s+(i.precio*i.cant),0); 
+            const pago = parseFloat(document.getElementById('input-pago').value);
             const lbl = document.getElementById('lbl-cambio');
-            if(pago >= total && total > 0) { lbl.classList.remove('hidden'); lbl.textContent = 'Cambio: $' + (pago-total).toFixed(2); } else lbl.classList.add('hidden');
+            
+            if(pago >= total && total > 0) { 
+                lbl.classList.remove('hidden'); 
+                lbl.textContent = 'Cambio: $' + (pago-total).toFixed(2); 
+            } else {
+                lbl.classList.add('hidden');
+            }
         }
 
-        // --- OTROS ---
+        // --- GESTIÓN DE CLIENTES ---
         function buscarCliente() {
             const q = document.getElementById('input-client').value.trim();
             const c = DB.cli().find(x => x.id === q || x.telefono === q);
-            if(c) { clienteActivo = c; updateClienteUI(); } else if(confirm("No encontrado. ¿Crear?")) modalCliente();
+            if(c) { clienteActivo = c; updateClienteUI(); } 
+            else if(confirm("Cliente no encontrado. ¿Deseas crearlo?")) modalCliente();
         }
+
         function updateClienteUI() {
             const badge = document.getElementById('puntos-badge');
             if(clienteActivo) {
@@ -417,22 +509,47 @@
             }
             updateBtnPuntos();
         }
+
         function quitarCliente() { clienteActivo = null; updateClienteUI(); }
+
         function updateBtnPuntos() {
-            const btn = document.getElementById('btn-pay-points'); const total = carrito.reduce((s,i)=>s+(i.precio*i.cant),0);
-            if(clienteActivo && total > 0 && clienteActivo.puntos >= total) { btn.disabled = false; btn.className = "w-full py-3 bg-green-500 text-white font-bold rounded-xl"; btn.textContent = `Pagar con Puntos (${clienteActivo.puntos})`; }
-            else { btn.disabled = true; btn.className = "w-full py-3 bg-slate-300 dark:bg-slate-700 text-slate-500 font-bold rounded-xl cursor-not-allowed"; btn.textContent = "Puntos insuficientes"; }
-        }
-        function modalCliente() { document.getElementById('new-cli-id').value = 'WT' + Date.now().toString().slice(-5); document.getElementById('modal-cliente').classList.remove('hidden'); }
-        function saveCliente(e) {
-            e.preventDefault(); const clis = DB.cli();
-            clis.push({ id: document.getElementById('new-cli-id').value, nombre: document.getElementById('new-cli-nom').value, telefono: document.getElementById('new-cli-tel').value, puntos: 0 });
-            DB.save('coco_clientes', clis); document.getElementById('modal-cliente').classList.add('hidden'); renderCliTable();
+            const btn = document.getElementById('btn-pay-points'); 
+            const total = carrito.reduce((s,i)=>s+(i.precio*i.cant),0);
+            
+            if(clienteActivo && total > 0 && clienteActivo.puntos >= total) { 
+                btn.disabled = false; 
+                btn.className = "w-full py-3 bg-green-500 text-white font-bold rounded-xl"; 
+                btn.textContent = `Pagar con Puntos (${clienteActivo.puntos})`; 
+            } else { 
+                btn.disabled = true; 
+                btn.className = "w-full py-3 bg-slate-300 dark:bg-slate-700 text-slate-500 font-bold rounded-xl cursor-not-allowed"; 
+                btn.textContent = "Puntos insuficientes"; 
+            }
         }
 
+        function modalCliente() {
+            document.getElementById('new-cli-id').value = 'WT' + Date.now().toString().slice(-5);
+            document.getElementById('modal-cliente').classList.remove('hidden');
+        }
+
+        function saveCliente(e) {
+            e.preventDefault(); 
+            const clis = DB.cli();
+            clis.push({ 
+                id: document.getElementById('new-cli-id').value, 
+                nombre: document.getElementById('new-cli-nom').value, 
+                telefono: document.getElementById('new-cli-tel').value, 
+                puntos: 0 
+            });
+            DB.save('coco_clientes', clis); 
+            document.getElementById('modal-cliente').classList.add('hidden'); 
+            renderCliTable();
+        }
+
+        // --- CIERRE DE CAJA ---
         function prepararCierreCaja() {
             if (!currentUser) return;
-            const data = { nombre: currentUser.name, fechaInicio: new Date(currentUser.inicioTurno).toLocaleString(), fechaCierre: new Date().toLocaleString(), horasLaboradas: '0h 0m', efectivo: 0, puntos: 0, total: 0, numVentas: 0 };
+            // Aquí puedes agregar lógica real de cálculos de turno si lo deseas
             const modal = document.createElement('div');
             modal.id = 'modal-cierre';
             modal.className = 'fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-sm';
@@ -440,7 +557,7 @@
                 <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-3xl p-6 font-mono text-sm dark:text-white border dark:border-slate-700">
                     <div class="text-center border-b-2 border-dashed border-slate-300 dark:border-slate-600 pb-4 mb-4">
                         <h2 class="text-xl font-black">CIERRE DE TURNO</h2>
-                        <p class="text-xs text-slate-500">¿Estás seguro de cerrar sesión?</p>
+                        <p class="text-xs text-slate-500">¿Deseas cerrar tu sesión actual?</p>
                     </div>
                     <div class="space-y-3">
                         <button onclick='document.getElementById("modal-cierre").remove(); logout()' class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold">CERRAR TURNO</button>
@@ -450,10 +567,21 @@
             document.body.appendChild(modal);
         }
 
-        // --- RENDERS ---
-        function renderCliTable() { const t = document.getElementById('table-clientes'); t.innerHTML = ''; DB.cli().forEach(c => t.innerHTML += `<tr class="border-b dark:border-slate-700"><td class="p-3 text-xs font-bold dark:text-white">${c.id}</td><td class="p-3 text-xs dark:text-slate-300">${c.nombre}</td><td class="p-3 text-xs text-orange-600 font-bold">${c.puntos} pts</td></tr>`); }
-        function renderUsersTable() { const t = document.getElementById('table-users'); t.innerHTML = ''; DB.users().forEach(u => t.innerHTML += `<tr class="border-b dark:border-slate-700"><td class="p-4 text-xs font-bold dark:text-white">${u.user}</td><td class="p-4 text-xs dark:text-slate-300">${u.name}</td><td class="p-4 text-xs uppercase font-black">${u.role}</td></tr>`); }
-        function renderHist() { const l = document.getElementById('list-ventas'); l.innerHTML = ''; DB.ven().forEach(v => l.innerHTML += `<div class="bg-white dark:bg-slate-800 p-3 border dark:border-slate-700 rounded text-xs flex justify-between mb-2"><div class="dark:text-white">#${v.id}</div><div class="font-bold dark:text-white">$${v.total}</div></div>`); }
+        // --- FUNCIONES DE DIBUJADO DE TABLAS ---
+        function renderCliTable() { 
+            const t = document.getElementById('table-clientes'); t.innerHTML = ''; 
+            DB.cli().forEach(c => t.innerHTML += `<tr class="border-b dark:border-slate-700"><td class="p-3 text-xs font-bold dark:text-white">${c.id}</td><td class="p-3 text-xs dark:text-slate-300">${c.nombre}</td><td class="p-3 text-xs text-orange-600 font-bold">${c.puntos} pts</td></tr>`); 
+        }
+        
+        function renderUsersTable() { 
+            const t = document.getElementById('table-users'); t.innerHTML = ''; 
+            DB.users().forEach(u => t.innerHTML += `<tr class="border-b dark:border-slate-700"><td class="p-4 text-xs font-bold dark:text-white">${u.user}</td><td class="p-4 text-xs dark:text-slate-300">${u.name}</td><td class="p-4 text-xs uppercase font-black">${u.role}</td></tr>`); 
+        }
+        
+        function renderHist() { 
+            const l = document.getElementById('list-ventas'); l.innerHTML = ''; 
+            DB.ven().forEach(v => l.innerHTML += `<div class="bg-white dark:bg-slate-800 p-3 border dark:border-slate-700 rounded text-xs flex justify-between mb-2"><div class="dark:text-white">#${v.id}</div><div class="font-bold dark:text-white">$${v.total}</div></div>`); 
+        }
     </script>
 </body>
 </html>
