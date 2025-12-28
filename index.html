@@ -15,6 +15,20 @@
                             850: '#151f32',
                             900: '#0f172a'
                         }
+                    },
+                    animation: {
+                        'slide-in': 'slideIn 0.3s ease-out forwards',
+                        'fade-out': 'fadeOut 0.3s ease-in forwards',
+                    },
+                    keyframes: {
+                        slideIn: {
+                            '0%': { transform: 'translateX(100%)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' },
+                        },
+                        fadeOut: {
+                            '0%': { transform: 'translateX(0)', opacity: '1' },
+                            '100%': { transform: 'translateX(100%)', opacity: '0' },
+                        }
                     }
                 }
             }
@@ -28,11 +42,15 @@
         .fade-in { animation: fadeIn 0.3s ease-in; }
         body { user-select: none; }
         input { user-select: text; }
-        /* Transiciones suaves para modo nocturno */
-        body, div, nav, aside, input, button, tr, td { transition: background-color 0.3s, border-color 0.3s, color 0.3s; }
+        body, div, nav, aside, input, button, tr, td, span, i { transition: background-color 0.3s, border-color 0.3s, color 0.3s, opacity 0.3s; }
+        
+        .toggle-checkbox:checked { right: 0; border-color: #4f46e5; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #4f46e5; }
     </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 h-screen font-sans overflow-hidden">
+
+    <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col items-end space-y-2 pointer-events-none"></div>
 
     <div id="screen-login" class="fixed inset-0 z-50 bg-slate-900 flex items-center justify-center">
         <div class="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md text-center animate-fade-in">
@@ -215,23 +233,64 @@
 
             <div id="view-ajustes" class="view-section hidden flex-1 p-8 overflow-y-auto">
                 <h2 class="text-3xl font-bold mb-8 dark:text-white">Ajustes</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                        <div>
-                            <h3 class="font-bold text-lg dark:text-white">Modo Nocturno</h3>
-                            <p class="text-slate-500 text-sm">Cambia la apariencia de la aplicación a colores oscuros.</p>
+                
+                <div class="max-w-3xl mx-auto space-y-8">
+                    
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-500 uppercase mb-3 ml-2">General</h3>
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden divide-y divide-slate-100 dark:divide-slate-700">
+                            
+                            <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 flex items-center justify-center mr-3">
+                                        <i class="fas fa-moon"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold dark:text-white">Modo Nocturno</div>
+                                        <div class="text-xs text-slate-500 dark:text-slate-400">Interfaz oscura</div>
+                                    </div>
+                                </div>
+                                <div class="relative inline-block w-12 h-6 align-middle select-none transition duration-200 ease-in">
+                                    <input type="checkbox" id="toggle-dark" onclick="toggleDarkMode()" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-slate-300 appearance-none cursor-pointer transition-all duration-300"/>
+                                    <label for="toggle-dark" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 cursor-pointer transition-colors duration-300"></label>
+                                </div>
+                            </div>
+
+                            <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300 flex items-center justify-center mr-3">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold dark:text-white">Sistema de Puntos</div>
+                                        <div class="text-xs text-slate-500 dark:text-slate-400">Acumular crédito en compras</div>
+                                    </div>
+                                </div>
+                                <div class="relative inline-block w-12 h-6 align-middle select-none transition duration-200 ease-in">
+                                    <input type="checkbox" id="toggle-points" onclick="togglePoints()" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-slate-300 appearance-none cursor-pointer transition-all duration-300"/>
+                                    <label for="toggle-points" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 cursor-pointer transition-colors duration-300"></label>
+                                </div>
+                            </div>
+
                         </div>
-                        <button onclick="toggleDarkMode()" id="btn-dark-mode" class="w-14 h-8 bg-slate-300 rounded-full relative transition-colors focus:outline-none">
-                            <div id="toggle-circle" class="w-6 h-6 bg-white rounded-full absolute top-1 left-1 shadow-md transform transition-transform"></div>
-                        </button>
                     </div>
-                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
-                        <h3 class="font-bold text-lg text-red-600 mb-2">Zona de Peligro</h3>
-                        <p class="text-slate-500 text-sm mb-4">Borrar todos los productos, clientes y ventas. Esta acción no se puede deshacer.</p>
-                        <button onclick="factoryReset()" class="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 font-bold rounded-lg text-sm transition-colors w-full border border-red-200">
-                            <i class="fas fa-trash-alt mr-2"></i> Restablecer Fábrica
-                        </button>
+
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-500 uppercase mb-3 ml-2">Sistema</h3>
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+                            <button onclick="factoryReset()" class="w-full p-4 flex items-center text-left hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors group">
+                                <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 flex items-center justify-center mr-3">
+                                    <i class="fas fa-trash-alt"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-bold text-red-600 dark:text-red-400">Restablecer Fábrica</div>
+                                    <div class="text-xs text-red-400 dark:text-red-500/70">Borrar todos los datos permanentemente</div>
+                                </div>
+                                <i class="fas fa-chevron-right text-slate-300 group-hover:text-red-300"></i>
+                            </button>
+                        </div>
                     </div>
+
                 </div>
             </div>
 
@@ -280,8 +339,6 @@
 
     <script>
         // --- BASE DE DATOS ---
-        // Estructura de usuarios actualizada para soportar permisos.
-        // Si no existen permisos (datos viejos), se asignan defaults en tiempo de ejecución.
         const DB = {
             inv: () => JSON.parse(localStorage.getItem('coco_inv')) || [{id:'001',nombre:'Coca Cola',precio:18,stock:50}],
             cli: () => JSON.parse(localStorage.getItem('coco_clientes')) || [],
@@ -306,11 +363,36 @@
         let clienteActivo = null;
         let currentUser = null;
         let isDarkMode = localStorage.getItem('coco_dark') === 'true';
+        let usePoints = localStorage.getItem('coco_points') !== 'false'; 
 
         // --- INICIO ---
         window.onload = () => {
             if(isDarkMode) applyDarkMode(true);
+            document.getElementById('toggle-points').checked = usePoints;
+            document.getElementById('toggle-dark').checked = isDarkMode;
         };
+
+        // --- NOTIFICACIONES (TOAST) ---
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            // Colores según tipo
+            const bgClass = type === 'error' ? 'bg-red-500' : (type === 'success' ? 'bg-green-500' : 'bg-slate-800');
+            
+            toast.className = `${bgClass} text-white p-4 rounded-xl shadow-2xl flex items-center animate-slide-in pointer-events-auto min-w-[300px]`;
+            toast.innerHTML = `
+                <div class="mr-3 text-xl"><i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i></div>
+                <div class="font-bold text-sm">${msg}</div>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Eliminar automáticamente
+            setTimeout(() => {
+                toast.classList.replace('animate-slide-in', 'animate-fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
 
         // --- AJUSTES Y TEMA ---
         function toggleDarkMode() {
@@ -321,25 +403,29 @@
 
         function applyDarkMode(enable) {
             const html = document.documentElement;
-            const btn = document.getElementById('btn-dark-mode');
-            const circle = document.getElementById('toggle-circle');
+            const chk = document.getElementById('toggle-dark');
             
             if(enable) {
                 html.classList.add('dark');
-                if(btn) btn.classList.replace('bg-slate-300', 'bg-indigo-600');
-                if(circle) circle.classList.add('translate-x-6');
+                if(chk) chk.checked = true;
             } else {
                 html.classList.remove('dark');
-                if(btn) btn.classList.replace('bg-indigo-600', 'bg-slate-300');
-                if(circle) circle.classList.remove('translate-x-6');
+                if(chk) chk.checked = false;
             }
+        }
+
+        function togglePoints() {
+            usePoints = !usePoints;
+            localStorage.setItem('coco_points', usePoints);
+            if(clienteActivo) updateClienteUI();
+            updateBtnPuntos();
         }
 
         function factoryReset() {
             if(confirm("¿ESTÁS SEGURO? Se borrará TODO el inventario, clientes y ventas.")) {
                 DB.clear();
-                alert("Sistema reiniciado. Se recargará la página.");
-                location.reload();
+                showToast("Sistema reiniciado", "success");
+                setTimeout(() => location.reload(), 1500);
             }
         }
 
@@ -351,16 +437,9 @@
             let found = DB.users().find(x => x.user.toLowerCase() === u.toLowerCase() && x.pass === p);
 
             if (found) {
-                // Migración 'on-the-fly' para usuarios viejos sin permisos definidos
                 if(!found.perms) {
                     const isAdmin = found.role === 'admin';
-                    found.perms = {
-                        pos: true,
-                        clientes: true,
-                        ventas: isAdmin,
-                        inv: isAdmin,
-                        admin: isAdmin
-                    };
+                    found.perms = { pos: true, clientes: true, ventas: isAdmin, inv: isAdmin, admin: isAdmin };
                 }
 
                 currentUser = {...found, inicioTurno: new Date()};
@@ -368,17 +447,18 @@
                 document.getElementById('screen-app').classList.remove('hidden');
                 document.getElementById('user-display-name').textContent = found.name.toUpperCase();
                 
-                applyUserPermissions(); // Aplicar permisos a la UI
+                applyUserPermissions(); 
                 nav('pos'); 
                 renderPos(); renderCliTable(); renderHist(); 
                 if(currentUser.perms.admin) renderUsersTable();
                 
-                if(document.getElementById('view-ajustes') && isDarkMode) applyDarkMode(true);
-            } else { alert("Datos incorrectos"); }
+                if(document.getElementById('toggle-dark')) document.getElementById('toggle-dark').checked = isDarkMode;
+                if(document.getElementById('toggle-points')) document.getElementById('toggle-points').checked = usePoints;
+
+            } else { showToast("Credenciales incorrectas", "error"); }
         }
 
         function applyUserPermissions() {
-            // Muestra u oculta botones del menú según permisos
             const p = currentUser.perms;
             const toggle = (id, show) => {
                 const el = document.getElementById(id);
@@ -389,7 +469,7 @@
             toggle('btn-ventas', p.ventas);
             toggle('btn-clientes', p.clientes);
             toggle('btn-inventario', p.inv);
-            toggle('menu-admin-users', p.admin); // El menú entero de admin
+            toggle('menu-admin-users', p.admin); 
         }
 
         function logout() {
@@ -412,7 +492,10 @@
             const active = document.getElementById('btn-' + vista);
             if(active) active.className = 'nav-btn w-full flex items-center p-4 rounded-xl bg-indigo-50 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 font-bold';
             
-            if(vista === 'ajustes') applyDarkMode(isDarkMode);
+            if(vista === 'ajustes') {
+                applyDarkMode(isDarkMode); 
+                document.getElementById('toggle-points').checked = usePoints;
+            }
         }
 
         // --- CIERRE DE CAJA ---
@@ -473,7 +556,7 @@
             const turnos = DB.turnos();
             turnos.push(data);
             DB.save('coco_turnos', turnos);
-            alert("Turno guardado correctamente. Sesión cerrada.");
+            showToast("Turno cerrado correctamente", "success");
             document.getElementById('modal-cierre').remove();
             logout();
         }
@@ -491,9 +574,9 @@
         }
 
         function addCarro(id) {
-            const p = DB.inv().find(x => x.id === id); if(!p || p.stock <= 0) return alert("Agotado");
+            const p = DB.inv().find(x => x.id === id); if(!p || p.stock <= 0) return showToast("Producto agotado", "error");
             const item = carrito.find(x => x.id === id);
-            if(item) { if(item.cant < p.stock) item.cant++; else alert("Sin stock disponible"); } else carrito.push({...p, cant: 1});
+            if(item) { if(item.cant < p.stock) item.cant++; else showToast("No hay más stock", "error"); } else carrito.push({...p, cant: 1});
             renderCart();
         }
 
@@ -516,18 +599,28 @@
 
         function cobrar(metodo) {
             const total = carrito.reduce((s,i)=>s+(i.precio*i.cant),0); if(total <= 0) return;
+            
             if(metodo === 'puntos') {
+                if(!usePoints) return showToast("Puntos desactivados", "error");
                 const clis = DB.cli(); const idx = clis.findIndex(c => c.id === clienteActivo.id);
-                if(clis[idx].puntos < total) return alert("Puntos insuficientes");
+                if(clis[idx].puntos < total) return showToast("Puntos insuficientes", "error");
                 clis[idx].puntos -= total; DB.save('coco_clientes', clis);
                 saveVenta(total, 'Puntos', 0, clienteActivo.id);
             } else {
                 const pago = parseFloat(document.getElementById('input-pago').value);
-                if(!pago || pago < total) return alert("Pago insuficiente");
-                let pts = 0; if(clienteActivo) { const clis = DB.cli(); const idx = clis.findIndex(c => c.id === clienteActivo.id); pts = Math.floor(total/10); clis[idx].puntos += pts; DB.save('coco_clientes', clis); }
+                if(!pago || pago < total) return showToast("Pago insuficiente", "error");
+                
+                let pts = 0; 
+                if(usePoints && clienteActivo) { 
+                    const clis = DB.cli(); const idx = clis.findIndex(c => c.id === clienteActivo.id); 
+                    pts = Math.floor(total/10); 
+                    clis[idx].puntos += pts; 
+                    DB.save('coco_clientes', clis); 
+                }
                 saveVenta(total, 'Efectivo', pts, clienteActivo ? clienteActivo.id : 'General');
             }
-            alert("Venta Exitosa"); carrito = []; quitarCliente(); document.getElementById('input-pago').value = ''; renderCart(); renderPos();
+            showToast("¡Venta Exitosa!", "success");
+            carrito = []; quitarCliente(); document.getElementById('input-pago').value = ''; renderCart(); renderPos();
         }
 
         function saveVenta(total, metodo, pts, cliId) {
@@ -547,7 +640,12 @@
         function buscarCliente() {
             const q = document.getElementById('input-client').value.trim();
             const c = DB.cli().find(x => x.id === q || x.telefono === q);
-            if(c) { clienteActivo = c; updateClienteUI(); } else if(confirm("No encontrado. ¿Crear?")) modalCliente();
+            if(c) { 
+                clienteActivo = c; updateClienteUI(); 
+            } else {
+                // Ya no usamos confirm() para no bloquear
+                showToast("Cliente no encontrado", "error");
+            }
         }
         function updateClienteUI() {
             const badge = document.getElementById('puntos-badge');
@@ -556,7 +654,13 @@
                 document.getElementById('client-info-box').classList.remove('hidden');
                 document.getElementById('lbl-cli-nombre').textContent = clienteActivo.nombre;
                 document.getElementById('lbl-cli-id').textContent = 'ID: ' + clienteActivo.id;
-                badge.textContent = clienteActivo.puntos + ' pts'; badge.classList.remove('hidden');
+                
+                if(usePoints) {
+                    badge.textContent = clienteActivo.puntos + ' pts'; 
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
             } else {
                 document.getElementById('client-search-box').classList.remove('hidden');
                 document.getElementById('client-info-box').classList.add('hidden');
@@ -567,6 +671,13 @@
         function quitarCliente() { clienteActivo = null; updateClienteUI(); }
         function updateBtnPuntos() {
             const btn = document.getElementById('btn-pay-points'); const total = carrito.reduce((s,i)=>s+(i.precio*i.cant),0);
+            
+            if(!usePoints) {
+                btn.style.display = 'none'; 
+                return;
+            }
+            btn.style.display = 'block'; 
+
             if(clienteActivo && total > 0 && clienteActivo.puntos >= total) { btn.disabled = false; btn.className = "w-full py-3 bg-green-500 text-white font-bold rounded-xl shadow-lg"; btn.textContent = `Pagar con Puntos (${clienteActivo.puntos})`; }
             else { btn.disabled = true; btn.className = "w-full py-3 bg-slate-300 dark:bg-slate-700 text-slate-500 rounded-xl cursor-not-allowed"; btn.textContent = "Puntos insuficientes"; }
         }
@@ -577,7 +688,10 @@
         function saveCliente(e) {
             e.preventDefault(); const clis = DB.cli();
             clis.push({ id: document.getElementById('new-cli-id').value, nombre: document.getElementById('new-cli-nom').value, telefono: document.getElementById('new-cli-tel').value, puntos: 0 });
-            DB.save('coco_clientes', clis); document.getElementById('modal-cliente').classList.add('hidden'); renderCliTable();
+            DB.save('coco_clientes', clis); 
+            document.getElementById('modal-cliente').classList.add('hidden'); 
+            renderCliTable();
+            showToast("Cliente registrado", "success");
         }
 
         // --- GESTIÓN DE USUARIOS ---
@@ -592,13 +706,13 @@
             e.preventDefault();
             const users = DB.users();
             const u = document.getElementById('new-user-login').value.trim();
-            if(users.some(x => x.user.toLowerCase() === u.toLowerCase())) return alert("Ese usuario ya existe");
+            if(users.some(x => x.user.toLowerCase() === u.toLowerCase())) return showToast("El usuario ya existe", "error");
 
             const newUser = {
                 user: u,
                 name: document.getElementById('new-user-name').value,
                 pass: document.getElementById('new-user-pass').value,
-                role: document.getElementById('perm-admin').checked ? 'admin' : 'user', // Backup compatibility
+                role: document.getElementById('perm-admin').checked ? 'admin' : 'user', 
                 perms: {
                     pos: document.getElementById('perm-pos').checked,
                     ventas: document.getElementById('perm-ventas').checked,
@@ -612,16 +726,17 @@
             DB.save('coco_users', users);
             document.getElementById('modal-usuario').classList.add('hidden');
             renderUsersTable();
-            alert("Usuario creado correctamente");
+            showToast("Usuario creado correctamente", "success");
         }
 
         function deleteUser(user) {
-            if(user === currentUser.user) return alert("No puedes eliminar tu propio usuario activo");
-            if(user === 'Admin') return alert("El Admin principal no se puede borrar");
+            if(user === currentUser.user) return showToast("No puedes eliminarte a ti mismo", "error");
+            if(user === 'Admin') return showToast("No se puede borrar al Admin principal", "error");
             if(confirm("¿Eliminar usuario " + user + "?")) {
                 const users = DB.users().filter(x => x.user !== user);
                 DB.save('coco_users', users);
                 renderUsersTable();
+                showToast("Usuario eliminado", "success");
             }
         }
 
@@ -629,7 +744,6 @@
             const t = document.getElementById('table-users'); 
             t.innerHTML = ''; 
             DB.users().forEach(u => {
-                // Si no tiene perms (usuario viejo), simular para mostrar en tabla
                 const p = u.perms || { admin: u.role === 'admin' };
                 let badges = '';
                 if(p.admin) badges += '<span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-bold mr-1">ADMIN</span>';
