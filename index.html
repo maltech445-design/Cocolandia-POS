@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cocolandia v5.0 - Gestión de Usuarios</title>
+    <title>Cocolandia v6.0.0 - Professional POS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -11,24 +11,15 @@
             theme: {
                 extend: {
                     colors: {
-                        slate: {
-                            850: '#151f32',
-                            900: '#0f172a'
-                        }
+                        slate: { 850: '#151f32', 900: '#0f172a' }
                     },
                     animation: {
                         'slide-in': 'slideIn 0.3s ease-out forwards',
                         'fade-out': 'fadeOut 0.3s ease-in forwards',
                     },
                     keyframes: {
-                        slideIn: {
-                            '0%': { transform: 'translateX(100%)', opacity: '0' },
-                            '100%': { transform: 'translateX(0)', opacity: '1' },
-                        },
-                        fadeOut: {
-                            '0%': { transform: 'translateX(0)', opacity: '1' },
-                            '100%': { transform: 'translateX(100%)', opacity: '0' },
-                        }
+                        slideIn: { '0%': { transform: 'translateX(100%)', opacity: '0' }, '100%': { transform: 'translateX(0)', opacity: '1' } },
+                        fadeOut: { '0%': { transform: 'translateX(0)', opacity: '1' }, '100%': { transform: 'translateX(100%)', opacity: '0' } }
                     }
                 }
             }
@@ -36,16 +27,22 @@
     </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 4px; }
         .fade-in { animation: fadeIn 0.3s ease-in; }
         body { user-select: none; }
         input { user-select: text; }
-        body, div, nav, aside, input, button, tr, td, span, i { transition: background-color 0.3s, border-color 0.3s, color 0.3s, opacity 0.3s; }
-        
+        body, div, nav, aside, input, button, tr, td, span, i { transition: background-color 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s; }
         .toggle-checkbox:checked { right: 0; border-color: #4f46e5; }
         .toggle-checkbox:checked + .toggle-label { background-color: #4f46e5; }
+        
+        /* Estilos para impresión de ticket */
+        @media print {
+            body * { visibility: hidden; }
+            #ticket-print-area, #ticket-print-area * { visibility: visible; }
+            #ticket-print-area { position: absolute; left: 0; top: 0; width: 100%; }
+        }
     </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 h-screen font-sans overflow-hidden">
@@ -59,9 +56,8 @@
                     <i class="fas fa-store"></i>
                 </div>
                 <h1 class="text-4xl font-black text-slate-800 tracking-tight">Cocolandia</h1>
-                <p class="text-slate-500 font-medium">Versión 5.0</p>
+                <p class="text-slate-500 font-medium">Versión 6.0.0</p>
             </div>
-            
             <form onsubmit="login(event)" class="space-y-5 text-left">
                 <div>
                     <label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-wider">Usuario</label>
@@ -78,8 +74,7 @@
                     </div>
                 </div>
                 <button class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 transition-transform active:scale-95 text-lg flex justify-center items-center">
-                    <span>ENTRAR</span>
-                    <i class="fas fa-arrow-right ml-2"></i>
+                    <span>ENTRAR</span><i class="fas fa-arrow-right ml-2"></i>
                 </button>
             </form>
             <p class="mt-8 text-xs text-slate-400">Default: <b>Admin</b> / 2508 | <b>cajero</b> / 0000</p>
@@ -120,7 +115,6 @@
                 <button onclick="nav('ventas')" id="btn-ventas" class="nav-btn w-full flex items-center p-4 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
                     <i class="fas fa-chart-line w-6 text-center"></i><span class="ml-3 font-medium">Historial</span>
                 </button>
-                
                 <div id="menu-admin-users" class="border-t border-slate-100 dark:border-slate-700 my-2 pt-2 hidden">
                     <p class="px-4 text-xs font-bold text-slate-400 uppercase mb-1">Admin</p>
                     <button onclick="nav('users')" id="btn-users" class="nav-btn w-full flex items-center p-4 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
@@ -143,9 +137,13 @@
             
             <div id="view-pos" class="view-section hidden flex-1 flex h-full">
                 <div class="flex-1 p-6 overflow-y-auto flex flex-col">
-                    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm flex items-center border border-slate-200 dark:border-slate-700 mb-4 sticky top-0 z-20">
-                        <i class="fas fa-search text-slate-400 ml-2"></i>
-                        <input type="text" id="buscador" oninput="renderPos(this.value)" placeholder="Buscar producto..." class="flex-1 ml-4 outline-none text-lg bg-transparent dark:text-white" autofocus>
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 mb-4 sticky top-0 z-20">
+                        <div class="flex items-center mb-3">
+                            <i class="fas fa-search text-slate-400 ml-2"></i>
+                            <input type="text" id="buscador" oninput="renderPos(this.value)" placeholder="Buscar producto..." class="flex-1 ml-4 outline-none text-lg bg-transparent dark:text-white" autofocus>
+                        </div>
+                        <div id="cat-filters" class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                            </div>
                     </div>
                     <div id="grid-productos" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 pb-20"></div>
                 </div>
@@ -176,12 +174,10 @@
                             <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Total</span>
                             <span id="lbl-total" class="text-4xl font-black text-slate-800 dark:text-white">$0.00</span>
                         </div>
-                        <div class="space-y-3">
-                            <input type="number" id="input-pago" oninput="calcCambio()" placeholder="Monto Efectivo" class="w-full p-4 border dark:border-slate-600 rounded-xl outline-none font-bold text-lg dark:bg-slate-700 dark:text-white">
-                            <div id="lbl-cambio" class="hidden text-right text-sm font-bold text-green-600">Cambio: $0.00</div>
-                            <button onclick="cobrar('efectivo')" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg">COBRAR EFECTIVO</button>
-                            <button id="btn-pay-points" onclick="cobrar('puntos')" disabled class="w-full py-3 bg-slate-300 dark:bg-slate-700 text-slate-500 font-bold rounded-xl text-sm cursor-not-allowed">Selecciona cliente</button>
-                        </div>
+                        <button onclick="abrirModalPago()" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg flex justify-between px-6 items-center">
+                            <span>COBRAR</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -189,19 +185,12 @@
             <div id="view-users" class="view-section hidden flex-1 p-8 overflow-y-auto">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-3xl font-bold dark:text-white">Usuarios</h2>
-                    <button onclick="modalUsuario()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 dark:shadow-none">
-                        <i class="fas fa-plus mr-2"></i> Nuevo Usuario
-                    </button>
+                    <button onclick="modalUsuario()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-lg dark:shadow-none"><i class="fas fa-plus mr-2"></i> Nuevo Usuario</button>
                 </div>
                 <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border dark:border-slate-700 overflow-hidden">
                     <table class="w-full text-left dark:text-slate-300">
                         <thead class="bg-slate-50 dark:bg-slate-700 border-b dark:border-slate-600">
-                            <tr>
-                                <th class="p-4">Usuario</th>
-                                <th class="p-4">Nombre</th>
-                                <th class="p-4">Permisos</th>
-                                <th class="p-4 text-right">Acciones</th>
-                            </tr>
+                            <tr><th class="p-4">Usuario</th><th class="p-4">Nombre</th><th class="p-4">Permisos</th><th class="p-4 text-right">Acciones</th></tr>
                         </thead>
                         <tbody id="table-users"></tbody>
                     </table>
@@ -209,7 +198,10 @@
             </div>
 
             <div id="view-ventas" class="view-section hidden flex-1 p-8 overflow-y-auto">
-                <h2 class="text-2xl font-bold mb-6 dark:text-white">Historial</h2>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold dark:text-white">Historial de Ventas</h2>
+                    <button onclick="exportToExcel()" class="bg-green-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-green-700"><i class="fas fa-file-excel mr-2"></i> Exportar CSV</button>
+                </div>
                 <div id="list-ventas" class="space-y-2"></div>
             </div>
 
@@ -223,9 +215,15 @@
             </div>
 
             <div id="view-inventario" class="view-section hidden flex-1 p-8 overflow-y-auto">
-                <h2 class="text-2xl font-bold mb-6 dark:text-white">Inventario</h2>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold dark:text-white">Inventario</h2>
+                    <button id="btn-add-prod" onclick="modalProducto()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-700"><i class="fas fa-plus mr-2"></i> Nuevo Producto</button>
+                </div>
                 <div class="bg-white dark:bg-slate-800 rounded-xl shadow overflow-hidden border dark:border-slate-700">
                     <table class="w-full text-left dark:text-slate-300">
+                        <thead class="bg-slate-50 dark:bg-slate-700 border-b dark:border-slate-600">
+                            <tr><th class="p-4">SKU</th><th class="p-4">Nombre</th><th class="p-4">Categoría</th><th class="p-4">Precio</th><th class="p-4">Stock</th><th class="p-4 text-right">Acciones</th></tr>
+                        </thead>
                         <tbody id="table-inv"></tbody>
                     </table>
                 </div>
@@ -233,74 +231,35 @@
 
             <div id="view-ajustes" class="view-section hidden flex-1 p-8 overflow-y-auto">
                 <h2 class="text-3xl font-bold mb-8 dark:text-white">Ajustes</h2>
-                
                 <div class="max-w-3xl mx-auto space-y-8">
-                    
                     <div>
                         <h3 class="text-sm font-bold text-slate-500 uppercase mb-3 ml-2">General</h3>
                         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden divide-y divide-slate-100 dark:divide-slate-700">
-                            
                             <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors">
-                                <div class="flex items-center">
-                                    <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 flex items-center justify-center mr-3">
-                                        <i class="fas fa-moon"></i>
-                                    </div>
-                                    <div>
-                                        <div class="font-bold dark:text-white">Modo Nocturno</div>
-                                        <div class="text-xs text-slate-500 dark:text-slate-400">Interfaz oscura</div>
-                                    </div>
-                                </div>
-                                <div class="relative inline-block w-12 h-6 align-middle select-none transition duration-200 ease-in">
-                                    <input type="checkbox" id="toggle-dark" onclick="toggleDarkMode()" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-slate-300 appearance-none cursor-pointer transition-all duration-300"/>
-                                    <label for="toggle-dark" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 cursor-pointer transition-colors duration-300"></label>
-                                </div>
+                                <div class="flex items-center"><div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 flex items-center justify-center mr-3"><i class="fas fa-moon"></i></div><div><div class="font-bold dark:text-white">Modo Nocturno</div><div class="text-xs text-slate-500 dark:text-slate-400">Interfaz oscura</div></div></div>
+                                <div class="relative inline-block w-12 h-6 align-middle select-none"><input type="checkbox" id="toggle-dark" onclick="toggleDarkMode()" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-slate-300 appearance-none cursor-pointer transition-all duration-300"/><label for="toggle-dark" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 cursor-pointer transition-colors duration-300"></label></div>
                             </div>
-
                             <div id="box-toggle-points" class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors">
-                                <div class="flex items-center">
-                                    <div class="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300 flex items-center justify-center mr-3">
-                                        <i class="fas fa-star"></i>
-                                    </div>
-                                    <div>
-                                        <div class="font-bold dark:text-white">Sistema de Puntos</div>
-                                        <div class="text-xs text-slate-500 dark:text-slate-400">Acumular crédito en compras</div>
-                                    </div>
-                                </div>
-                                <div class="relative inline-block w-12 h-6 align-middle select-none transition duration-200 ease-in">
-                                    <input type="checkbox" id="toggle-points" onclick="togglePoints()" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-slate-300 appearance-none cursor-pointer transition-all duration-300"/>
-                                    <label for="toggle-points" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 cursor-pointer transition-colors duration-300"></label>
-                                </div>
+                                <div class="flex items-center"><div class="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300 flex items-center justify-center mr-3"><i class="fas fa-star"></i></div><div><div class="font-bold dark:text-white">Sistema de Puntos</div><div class="text-xs text-slate-500 dark:text-slate-400">Acumular crédito en compras</div></div></div>
+                                <div class="relative inline-block w-12 h-6 align-middle select-none"><input type="checkbox" id="toggle-points" onclick="togglePoints()" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-slate-300 appearance-none cursor-pointer transition-all duration-300"/><label for="toggle-points" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 cursor-pointer transition-colors duration-300"></label></div>
                             </div>
-
                         </div>
                     </div>
-
                     <div>
                         <h3 class="text-sm font-bold text-slate-500 uppercase mb-3 ml-2">Sistema</h3>
                         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-                            
                             <div id="btn-factory-reset" class="hidden">
                                 <button onclick="factoryReset()" class="w-full p-4 flex items-center text-left hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors group">
-                                    <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 flex items-center justify-center mr-3">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </div>
-                                    <div class="flex-1">
-                                        <div class="font-bold text-red-600 dark:text-red-400">Restablecer Fábrica</div>
-                                        <div class="text-xs text-red-400 dark:text-red-500/70">Borrar todos los datos permanentemente</div>
-                                    </div>
+                                    <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 flex items-center justify-center mr-3"><i class="fas fa-trash-alt"></i></div>
+                                    <div class="flex-1"><div class="font-bold text-red-600 dark:text-red-400">Restablecer Fábrica</div><div class="text-xs text-red-400 dark:text-red-500/70">Borrar todos los datos permanentemente</div></div>
                                     <i class="fas fa-chevron-right text-slate-300 group-hover:text-red-300"></i>
                                 </button>
                             </div>
-                            <div id="msg-no-perm" class="p-4 text-center text-slate-400 text-sm italic hidden">
-                                Solo el administrador puede ver las opciones avanzadas.
-                            </div>
-
+                            <div id="msg-no-perm" class="p-4 text-center text-slate-400 text-sm italic hidden">Solo el administrador puede ver las opciones avanzadas.</div>
                         </div>
                     </div>
-
                 </div>
             </div>
-
         </main>
     </div>
 
@@ -326,7 +285,6 @@
                     <input id="new-user-login" required class="w-full border dark:border-slate-600 dark:bg-slate-700 dark:text-white p-3 rounded-xl" placeholder="Usuario (Login)">
                 </div>
                 <input id="new-user-pass" required type="text" class="w-full border dark:border-slate-600 dark:bg-slate-700 dark:text-white p-3 rounded-xl font-mono" placeholder="Contraseña">
-                
                 <div class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-xl border dark:border-slate-600">
                     <p class="text-xs font-bold text-slate-400 uppercase mb-3">Asignar Permisos</p>
                     <div class="grid grid-cols-2 gap-y-2 text-sm dark:text-slate-300">
@@ -337,9 +295,65 @@
                         <label class="flex items-center text-indigo-600 font-bold"><input type="checkbox" id="perm-admin" class="mr-2"> ADMIN (Usuarios)</label>
                     </div>
                 </div>
-
                 <button class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-lg">Crear Usuario</button>
                 <button type="button" onclick="document.getElementById('modal-usuario').classList.add('hidden')" class="w-full py-2 text-slate-500 hover:text-slate-700 dark:text-slate-400">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-pago" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-indigo-600 p-6 text-white text-center">
+                <div class="text-sm font-medium opacity-80">TOTAL A PAGAR</div>
+                <div id="pago-total-disp" class="text-5xl font-black mt-2">$0.00</div>
+            </div>
+            <div class="p-6 space-y-4 flex-1 overflow-y-auto dark:text-white">
+                <div>
+                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Método de Pago</label>
+                    <div class="grid grid-cols-3 gap-2 mt-2">
+                        <button onclick="selMetodo('Efectivo')" id="btn-met-efectivo" class="metodo-btn bg-slate-100 dark:bg-slate-700 p-3 rounded-xl border-2 border-transparent hover:border-indigo-500 focus:border-indigo-500 flex flex-col items-center gap-1 transition-all"><i class="fas fa-money-bill-wave text-green-500 text-xl"></i><span class="text-xs font-bold">Efectivo</span></button>
+                        <button onclick="selMetodo('Tarjeta')" id="btn-met-tarjeta" class="metodo-btn bg-slate-100 dark:bg-slate-700 p-3 rounded-xl border-2 border-transparent hover:border-indigo-500 focus:border-indigo-500 flex flex-col items-center gap-1 transition-all"><i class="fas fa-credit-card text-blue-500 text-xl"></i><span class="text-xs font-bold">Tarjeta</span></button>
+                        <button onclick="selMetodo('Transferencia')" id="btn-met-transf" class="metodo-btn bg-slate-100 dark:bg-slate-700 p-3 rounded-xl border-2 border-transparent hover:border-indigo-500 focus:border-indigo-500 flex flex-col items-center gap-1 transition-all"><i class="fas fa-mobile-alt text-purple-500 text-xl"></i><span class="text-xs font-bold">Transf.</span></button>
+                    </div>
+                </div>
+                
+                <div id="pago-efectivo-box" class="animate-slide-in">
+                    <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Dinero Recibido</label>
+                    <input type="number" id="input-pago-modal" oninput="calcCambioModal()" class="w-full p-4 text-2xl font-bold border-2 border-slate-200 dark:border-slate-600 rounded-xl mt-1 outline-none focus:border-indigo-500 bg-transparent" placeholder="$0.00">
+                    <div id="lbl-cambio-modal" class="text-right font-bold text-green-600 mt-2 h-6"></div>
+                </div>
+
+                <button id="btn-puntos-modal" onclick="procesarPago('Puntos')" class="hidden w-full p-3 bg-orange-100 text-orange-700 rounded-xl font-bold border border-orange-200 hover:bg-orange-200 transition-colors">
+                    <i class="fas fa-star mr-2"></i> Pagar con Puntos
+                </button>
+            </div>
+            <div class="p-4 bg-slate-50 dark:bg-slate-900 border-t dark:border-slate-700 flex gap-3">
+                <button onclick="document.getElementById('modal-pago').classList.add('hidden')" class="flex-1 py-3 text-slate-500 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">Cancelar</button>
+                <button onclick="procesarPago()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg transition-transform active:scale-95">CONFIRMAR</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-producto" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border dark:border-slate-700">
+            <h3 id="modal-prod-title" class="text-xl font-bold mb-4 dark:text-white">Nuevo Producto</h3>
+            <form onsubmit="saveProduct(event)" class="space-y-3">
+                <input id="prod-id" class="w-full bg-slate-50 dark:bg-slate-700 dark:text-white border dark:border-slate-600 p-2 rounded" placeholder="Código (SKU) *" required>
+                <input id="prod-nom" class="w-full bg-slate-50 dark:bg-slate-700 dark:text-white border dark:border-slate-600 p-2 rounded" placeholder="Nombre del Producto *" required>
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="prod-precio" type="number" step="0.01" class="w-full bg-slate-50 dark:bg-slate-700 dark:text-white border dark:border-slate-600 p-2 rounded" placeholder="Precio $" required>
+                    <input id="prod-stock" type="number" class="w-full bg-slate-50 dark:bg-slate-700 dark:text-white border dark:border-slate-600 p-2 rounded" placeholder="Stock" required>
+                </div>
+                <select id="prod-cat" class="w-full bg-slate-50 dark:bg-slate-700 dark:text-white border dark:border-slate-600 p-2 rounded">
+                    <option value="General">General</option>
+                    <option value="Bebidas">Bebidas</option>
+                    <option value="Alimentos">Alimentos</option>
+                    <option value="Snacks">Snacks</option>
+                    <option value="Servicios">Servicios</option>
+                    <option value="Otros">Otros</option>
+                </select>
+                <button class="w-full py-2 bg-indigo-600 text-white rounded font-bold hover:bg-indigo-700 mt-2">Guardar Producto</button>
+                <button type="button" onclick="document.getElementById('modal-producto').classList.add('hidden')" class="w-full py-2 text-slate-500 hover:text-slate-700 dark:text-slate-400">Cancelar</button>
             </form>
         </div>
     </div>
@@ -347,7 +361,11 @@
     <script>
         // --- BASE DE DATOS ---
         const DB = {
-            inv: () => JSON.parse(localStorage.getItem('coco_inv')) || [{id:'001',nombre:'Coca Cola',precio:18,stock:50}],
+            inv: () => JSON.parse(localStorage.getItem('coco_inv')) || [
+                {id:'001', nombre:'Coca Cola 600ml', precio:18, stock:50, cat:'Bebidas'},
+                {id:'002', nombre:'Sabritas Sal 45g', precio:17, stock:30, cat:'Snacks'},
+                {id:'003', nombre:'Agua Ciel 1L', precio:12, stock:40, cat:'Bebidas'}
+            ],
             cli: () => JSON.parse(localStorage.getItem('coco_clientes')) || [],
             ven: () => JSON.parse(localStorage.getItem('coco_ven')) || [],
             users: () => {
@@ -371,437 +389,352 @@
         let currentUser = null;
         let isDarkMode = localStorage.getItem('coco_dark') === 'true';
         let usePoints = localStorage.getItem('coco_points') !== 'false'; 
+        let currentMetodo = 'Efectivo';
+        let activeCat = 'Todos';
 
         // --- INICIO ---
         window.onload = () => {
             if(isDarkMode) applyDarkMode(true);
             document.getElementById('toggle-points').checked = usePoints;
             document.getElementById('toggle-dark').checked = isDarkMode;
+            renderCategories();
         };
 
-        // --- NOTIFICACIONES (TOAST) ---
+        // --- UTILIDADES ---
         function showToast(msg, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             const bgClass = type === 'error' ? 'bg-red-500' : (type === 'success' ? 'bg-green-500' : 'bg-slate-800');
-            
             toast.className = `${bgClass} text-white p-4 rounded-xl shadow-2xl flex items-center animate-slide-in pointer-events-auto min-w-[300px]`;
-            toast.innerHTML = `
-                <div class="mr-3 text-xl"><i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i></div>
-                <div class="font-bold text-sm">${msg}</div>
-            `;
-            
+            toast.innerHTML = `<div class="mr-3 text-xl"><i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i></div><div class="font-bold text-sm">${msg}</div>`;
             container.appendChild(toast);
-            setTimeout(() => {
-                toast.classList.replace('animate-slide-in', 'animate-fade-out');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            setTimeout(() => { toast.classList.replace('animate-slide-in', 'animate-fade-out'); setTimeout(() => toast.remove(), 300); }, 3000);
         }
 
-        // --- AJUSTES Y TEMA ---
-        function toggleDarkMode() {
-            isDarkMode = !isDarkMode;
-            localStorage.setItem('coco_dark', isDarkMode);
-            applyDarkMode(isDarkMode);
-        }
-
+        function toggleDarkMode() { isDarkMode = !isDarkMode; localStorage.setItem('coco_dark', isDarkMode); applyDarkMode(isDarkMode); }
         function applyDarkMode(enable) {
-            const html = document.documentElement;
-            const chk = document.getElementById('toggle-dark');
-            
-            if(enable) {
-                html.classList.add('dark');
-                if(chk) chk.checked = true;
-            } else {
-                html.classList.remove('dark');
-                if(chk) chk.checked = false;
-            }
+            const html = document.documentElement; const chk = document.getElementById('toggle-dark');
+            if(enable) { html.classList.add('dark'); if(chk) chk.checked = true; } else { html.classList.remove('dark'); if(chk) chk.checked = false; }
         }
+        function togglePoints() { usePoints = !usePoints; localStorage.setItem('coco_points', usePoints); if(clienteActivo) updateClienteUI(); }
 
-        function togglePoints() {
-            usePoints = !usePoints;
-            localStorage.setItem('coco_points', usePoints);
-            if(clienteActivo) updateClienteUI();
-            updateBtnPuntos();
-        }
-
-        function factoryReset() {
-            if(!currentUser || !currentUser.perms.admin) return showToast("No tienes permiso", "error");
-            if(confirm("¿ESTÁS SEGURO? Se borrará TODO el inventario, clientes y ventas.")) {
-                DB.clear();
-                showToast("Sistema reiniciado", "success");
-                setTimeout(() => location.reload(), 1500);
-            }
-        }
-
-        // --- LOGIN & SESIÓN ---
+        // --- LOGIN & NAV ---
         function login(e) {
             e.preventDefault();
             const u = document.getElementById('login-user').value;
             const p = document.getElementById('login-pass').value;
             let found = DB.users().find(x => x.user.toLowerCase() === u.toLowerCase() && x.pass === p);
-
             if (found) {
-                if(!found.perms) {
+                if(!found.perms) { // Migration fix
                     const isAdmin = found.role === 'admin';
                     found.perms = { pos: true, clientes: true, ventas: isAdmin, inv: isAdmin, admin: isAdmin };
                 }
-
                 currentUser = {...found, inicioTurno: new Date()};
                 document.getElementById('screen-login').classList.add('hidden');
                 document.getElementById('screen-app').classList.remove('hidden');
                 document.getElementById('user-display-name').textContent = found.name.toUpperCase();
+                applyUserPermissions();
                 
-                applyUserPermissions(); 
-                
-                // Navegación inteligente: ir al primer permiso disponible
+                // Smart Redirect
                 if(found.perms.pos) nav('pos');
                 else if(found.perms.ventas) nav('ventas');
-                else if(found.perms.clientes) nav('clientes');
                 else if(found.perms.inv) nav('inventario');
                 else nav('ajustes');
 
-                renderPos(); renderCliTable(); renderHist(); 
-                if(currentUser.perms.admin) renderUsersTable();
-                
+                renderPos(); renderCliTable(); renderHist(); if(currentUser.perms.admin) renderUsersTable(); renderInvTable();
                 if(document.getElementById('toggle-dark')) document.getElementById('toggle-dark').checked = isDarkMode;
                 if(document.getElementById('toggle-points')) document.getElementById('toggle-points').checked = usePoints;
-
             } else { showToast("Credenciales incorrectas", "error"); }
         }
 
         function applyUserPermissions() {
             const p = currentUser.perms;
-            const toggle = (id, show) => {
-                const el = document.getElementById(id);
-                if(el) show ? el.classList.remove('hidden') : el.classList.add('hidden');
-            };
-
-            toggle('btn-pos', p.pos);
-            toggle('btn-ventas', p.ventas);
-            toggle('btn-clientes', p.clientes);
-            toggle('btn-inventario', p.inv);
-            toggle('menu-admin-users', p.admin); 
-            
-            // Seguridad en Ajustes
-            toggle('box-toggle-points', p.admin); // AHORA SOLO ADMIN VE PUNTOS
-            toggle('btn-factory-reset', p.admin);
-            toggle('msg-no-perm', !p.admin);
+            const toggle = (id, show) => { const el = document.getElementById(id); if(el) show ? el.classList.remove('hidden') : el.classList.add('hidden'); };
+            toggle('btn-pos', p.pos); toggle('btn-ventas', p.ventas); toggle('btn-clientes', p.clientes); toggle('btn-inventario', p.inv);
+            toggle('menu-admin-users', p.admin); toggle('box-toggle-points', p.admin); toggle('btn-factory-reset', p.admin); toggle('msg-no-perm', !p.admin);
+            toggle('btn-add-prod', p.inv); // CRUD protection
         }
 
         function logout() {
-            currentUser = null;
-            document.getElementById('screen-app').classList.add('hidden');
-            document.getElementById('screen-login').classList.remove('hidden');
-            document.getElementById('login-user').value = '';
-            document.getElementById('login-pass').value = '';
-            // Resetear vistas por seguridad
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            currentUser = null; document.getElementById('screen-app').classList.add('hidden'); document.getElementById('screen-login').classList.remove('hidden');
+            document.getElementById('login-user').value = ''; document.getElementById('login-pass').value = '';
         }
 
         function nav(vista) {
-            // MAPA DE PERMISOS
-            const permMap = {
-                'pos': 'pos',
-                'ventas': 'ventas',
-                'clientes': 'clientes',
-                'inventario': 'inv',
-                'users': 'admin',
-                'ajustes': null // Acceso público
-            };
-
-            // VERIFICACIÓN DE SEGURIDAD ESTRICTA
-            if(currentUser && permMap[vista] && !currentUser.perms[permMap[vista]]) {
-                return showToast("🚫 Acceso Denegado: No tienes permiso", "error");
-            }
-
+            const permMap = { 'pos':'pos', 'ventas':'ventas', 'clientes':'clientes', 'inventario':'inv', 'users':'admin', 'ajustes':null };
+            if(currentUser && permMap[vista] && !currentUser.perms[permMap[vista]]) return showToast("🚫 Acceso Denegado", "error");
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            const target = document.getElementById('view-' + vista);
-            if(target) target.classList.remove('hidden');
-            
-            document.querySelectorAll('.nav-btn').forEach(btn => 
-                btn.className = 'nav-btn w-full flex items-center p-4 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all'
-            );
-            
-            const active = document.getElementById('btn-' + vista);
-            if(active) active.className = 'nav-btn w-full flex items-center p-4 rounded-xl bg-indigo-50 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 font-bold';
-            
-            if(vista === 'ajustes') {
-                applyDarkMode(isDarkMode); 
-                document.getElementById('toggle-points').checked = usePoints;
-            }
+            document.getElementById('view-' + vista).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.className = 'nav-btn w-full flex items-center p-4 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all');
+            const active = document.getElementById('btn-' + vista); if(active) active.className = 'nav-btn w-full flex items-center p-4 rounded-xl bg-indigo-50 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 font-bold';
+            if(vista === 'ajustes') { applyDarkMode(isDarkMode); document.getElementById('toggle-points').checked = usePoints; }
         }
 
-        // --- CIERRE DE CAJA ---
-        function prepararCierreCaja() {
-            if (!currentUser) return;
-            const ahora = new Date();
-            const inicio = new Date(currentUser.inicioTurno);
-            const difMs = ahora - inicio;
-            const horas = Math.floor(difMs / 3600000);
-            const minutos = Math.floor((difMs % 3600000) / 60000);
-
-            const ventasTurno = DB.ven().filter(v => v.vendedor === currentUser.user && new Date(v.fechaRaw || v.id) >= inicio);
-            const totalEfectivo = ventasTurno.filter(v => v.metodo === 'Efectivo').reduce((s, v) => s + v.total, 0);
-            const totalPuntos = ventasTurno.filter(v => v.metodo === 'Puntos').reduce((s, v) => s + v.total, 0);
-
-            const data = {
-                vendedor: currentUser.user,
-                nombre: currentUser.name,
-                fechaInicio: inicio.toLocaleString(),
-                fechaCierre: ahora.toLocaleString(),
-                horasLaboradas: `${horas}h ${minutos}m`,
-                efectivo: totalEfectivo,
-                puntos: totalPuntos,
-                total: totalEfectivo + totalPuntos,
-                numVentas: ventasTurno.length
-            };
-
-            const modal = document.createElement('div');
-            modal.id = 'modal-cierre';
-            modal.className = 'fixed inset-0 bg-slate-900 z-[100] flex items-center justify-center p-4 backdrop-blur-sm';
-            modal.innerHTML = `
-                <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl p-6 font-mono text-sm dark:text-slate-300">
-                    <div class="text-center border-b-2 border-dashed border-slate-200 dark:border-slate-600 pb-4 mb-4">
-                        <h2 class="text-xl font-black text-slate-800 dark:text-white">COCOLANDIA</h2>
-                        <p>CIERRE DE TURNO</p>
-                    </div>
-                    <div class="space-y-2 mb-6 text-[10px]">
-                        <p><b>CAJERO:</b> ${data.nombre}</p>
-                        <p><b>INICIO:</b> ${data.fechaInicio}</p>
-                        <p><b>CIERRE:</b> ${data.fechaCierre}</p>
-                        <p><b>TIEMPO:</b> ${data.horasLaboradas}</p>
-                    </div>
-                    <div class="border-b-2 border-dashed border-slate-200 dark:border-slate-600 pb-4 mb-4 space-y-1">
-                        <div class="flex justify-between font-bold"><span>VENTAS (${data.numVentas})</span> <span>$${data.total.toFixed(2)}</span></div>
-                        <div class="flex justify-between text-slate-500"><span>- Efectivo</span> <span>$${data.efectivo.toFixed(2)}</span></div>
-                        <div class="flex justify-between text-slate-500"><span>- Puntos</span> <span>$${data.puntos.toFixed(2)}</span></div>
-                    </div>
-                    <div class="text-center text-lg font-black mb-6 text-indigo-600 uppercase">Total Efectivo: $${data.efectivo.toFixed(2)}</div>
-                    <div class="space-y-2">
-                        <button onclick='confirmarCierre(${JSON.stringify(data)})' class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold">TERMINAR Y GUARDAR</button>
-                        <button onclick="document.getElementById('modal-cierre').remove()" class="w-full py-3 text-slate-400 font-bold hover:text-slate-600">VOLVER AL PUNTO DE VENTA</button>
-                    </div>
-                </div>`;
-            document.body.appendChild(modal);
+        // --- POS & CATEGORÍAS ---
+        function renderCategories() {
+            const cats = ['Todos', 'General', 'Bebidas', 'Alimentos', 'Snacks', 'Servicios', 'Otros'];
+            const con = document.getElementById('cat-filters'); con.innerHTML = '';
+            cats.forEach(c => {
+                con.innerHTML += `<button onclick="filterCat('${c}')" class="px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-colors ${activeCat===c ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200'}">${c}</button>`;
+            });
         }
-
-        function confirmarCierre(data) {
-            const turnos = DB.turnos();
-            turnos.push(data);
-            DB.save('coco_turnos', turnos);
-            showToast("Turno cerrado correctamente", "success");
-            document.getElementById('modal-cierre').remove();
-            logout();
-        }
-
-        // --- POS & VENTAS ---
+        function filterCat(c) { activeCat = c; renderPos(document.getElementById('buscador').value); renderCategories(); }
         function renderPos(f='') {
             const grid = document.getElementById('grid-productos'); grid.innerHTML = '';
-            DB.inv().filter(p => p.nombre.toLowerCase().includes(f.toLowerCase()) || p.id.includes(f)).forEach(p => {
+            let data = DB.inv().filter(p => p.nombre.toLowerCase().includes(f.toLowerCase()) || p.id.includes(f));
+            if(activeCat !== 'Todos') data = data.filter(p => (p.cat || 'General') === activeCat);
+            
+            data.forEach(p => {
                 grid.innerHTML += `
-                    <div onclick="addCarro('${p.id}')" class="bg-white dark:bg-slate-800 p-4 rounded-xl border dark:border-slate-700 hover:border-indigo-500 cursor-pointer shadow-sm ${p.stock<=0?'opacity-50 grayscale':''}">
-                        <h3 class="font-bold text-slate-800 dark:text-white text-sm mb-3 h-10 overflow-hidden">${p.nombre}</h3>
-                        <div class="flex justify-between items-end"><span class="text-xl font-black text-indigo-600">$${p.precio}</span><span class="text-[10px] text-slate-400 font-bold">STOCK: ${p.stock}</span></div>
+                    <div onclick="addCarro('${p.id}')" class="bg-white dark:bg-slate-800 p-4 rounded-xl border dark:border-slate-700 hover:border-indigo-500 cursor-pointer shadow-sm relative overflow-hidden ${p.stock<=0?'opacity-60':''}">
+                        ${p.stock<=5 ? '<div class="absolute top-0 right-0 bg-red-500 text-white text-[10px] px-2 py-1 font-bold rounded-bl-lg">BAJO STOCK</div>' : ''}
+                        <div class="text-[10px] text-slate-400 font-bold uppercase mb-1">${p.cat || 'GENERAL'}</div>
+                        <h3 class="font-bold text-slate-800 dark:text-white text-sm mb-3 h-10 overflow-hidden leading-tight">${p.nombre}</h3>
+                        <div class="flex justify-between items-end"><span class="text-xl font-black text-indigo-600">$${p.precio}</span><span class="text-[10px] ${p.stock<=0?'text-red-500':'text-slate-400'} font-bold">STOCK: ${p.stock}</span></div>
                     </div>`;
             });
         }
-
         function addCarro(id) {
             const p = DB.inv().find(x => x.id === id); if(!p || p.stock <= 0) return showToast("Producto agotado", "error");
-            const item = carrito.find(x => x.id === id);
-            if(item) { if(item.cant < p.stock) item.cant++; else showToast("No hay más stock", "error"); } else carrito.push({...p, cant: 1});
+            const item = carrito.find(x => x.id === id); if(item) { if(item.cant < p.stock) item.cant++; else showToast("Stock límite alcanzado", "error"); } else carrito.push({...p, cant: 1});
             renderCart();
         }
-
         function renderCart() {
             const list = document.getElementById('cart-list'); list.innerHTML = ''; let total = 0;
-            carrito.forEach((p, i) => {
-                total += p.precio * p.cant;
-                list.innerHTML += `<div class="flex justify-between items-center bg-white dark:bg-slate-700 p-2 rounded border dark:border-slate-600 text-xs dark:text-white"><div><b>${p.nombre}</b><br>$${p.precio} x ${p.cant}</div><div class="flex items-center gap-1"><button onclick="modCart(${i},-1)" class="w-6 h-6 bg-slate-100 dark:bg-slate-600 rounded text-slate-800 dark:text-white">-</button><button onclick="modCart(${i},1)" class="w-6 h-6 bg-indigo-100 dark:bg-indigo-900 rounded text-indigo-800 dark:text-white">+</button></div></div>`;
-            });
+            carrito.forEach((p, i) => { total += p.precio * p.cant; list.innerHTML += `<div class="flex justify-between items-center bg-white dark:bg-slate-700 p-2 rounded border dark:border-slate-600 text-xs dark:text-white"><div><b>${p.nombre}</b><br>$${p.precio} x ${p.cant}</div><div class="flex items-center gap-1"><button onclick="modCart(${i},-1)" class="w-6 h-6 bg-slate-100 dark:bg-slate-600 rounded text-slate-800 dark:text-white">-</button><button onclick="modCart(${i},1)" class="w-6 h-6 bg-indigo-100 dark:bg-indigo-900 rounded text-indigo-800 dark:text-white">+</button></div></div>`; });
             document.getElementById('lbl-total').textContent = '$' + total.toFixed(2);
             document.getElementById('cart-count').textContent = carrito.length + ' items';
-            updateBtnPuntos(); calcCambio();
         }
+        function modCart(i, d) { const real = DB.inv().find(p => p.id === carrito[i].id); if(carrito[i].cant + d > 0 && carrito[i].cant + d <= real.stock) carrito[i].cant += d; else if(carrito[i].cant + d <= 0) carrito.splice(i, 1); renderCart(); }
 
-        function modCart(i, d) {
-            const real = DB.inv().find(p => p.id === carrito[i].id);
-            if(carrito[i].cant + d > 0 && carrito[i].cant + d <= real.stock) carrito[i].cant += d; else if(carrito[i].cant + d <= 0) carrito.splice(i, 1);
-            renderCart();
-        }
-
-        function cobrar(metodo) {
-            const total = carrito.reduce((s,i)=>s+(i.precio*i.cant),0); if(total <= 0) return;
+        // --- COBRO AVANZADO ---
+        function abrirModalPago() {
+            const total = carrito.reduce((s,i)=>s+(i.precio*i.cant),0); if(total <= 0) return showToast("Carrito vacío", "error");
+            document.getElementById('pago-total-disp').textContent = '$' + total.toFixed(2);
+            document.getElementById('input-pago-modal').value = '';
+            document.getElementById('lbl-cambio-modal').textContent = '';
             
-            if(metodo === 'puntos') {
-                if(!usePoints) return showToast("Puntos desactivados", "error");
+            // Puntos logic
+            const btnPts = document.getElementById('btn-puntos-modal');
+            if(usePoints && clienteActivo && clienteActivo.puntos >= total) {
+                btnPts.classList.remove('hidden');
+                btnPts.innerHTML = `<i class="fas fa-star mr-2"></i> Pagar con Puntos (${clienteActivo.puntos} disponibles)`;
+            } else { btnPts.classList.add('hidden'); }
+
+            document.getElementById('modal-pago').classList.remove('hidden');
+            selMetodo('Efectivo');
+        }
+
+        function selMetodo(m) {
+            currentMetodo = m;
+            document.querySelectorAll('.metodo-btn').forEach(b => b.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-slate-600'));
+            const btn = document.getElementById(m === 'Efectivo' ? 'btn-met-efectivo' : (m === 'Tarjeta' ? 'btn-met-tarjeta' : 'btn-met-transf'));
+            if(btn) btn.classList.add('border-indigo-500', 'bg-indigo-50', 'dark:bg-slate-600');
+            
+            const efBox = document.getElementById('pago-efectivo-box');
+            if(m === 'Efectivo') { efBox.classList.remove('hidden'); setTimeout(() => document.getElementById('input-pago-modal').focus(), 100); } 
+            else efBox.classList.add('hidden');
+        }
+
+        function calcCambioModal() {
+            const total = carrito.reduce((s,i)=>s+(i.precio*i.cant),0);
+            const pago = parseFloat(document.getElementById('input-pago-modal').value) || 0;
+            const lbl = document.getElementById('lbl-cambio-modal');
+            if(pago >= total) lbl.textContent = 'Cambio: $' + (pago - total).toFixed(2);
+            else lbl.textContent = 'Faltan: $' + (total - pago).toFixed(2);
+        }
+
+        function procesarPago(forcedMethod) {
+            const total = carrito.reduce((s,i)=>s+(i.precio*i.cant),0);
+            const metodo = forcedMethod || currentMetodo;
+
+            if(metodo === 'Puntos') {
                 const clis = DB.cli(); const idx = clis.findIndex(c => c.id === clienteActivo.id);
-                if(clis[idx].puntos < total) return showToast("Puntos insuficientes", "error");
                 clis[idx].puntos -= total; DB.save('coco_clientes', clis);
                 saveVenta(total, 'Puntos', 0, clienteActivo.id);
             } else {
-                const pago = parseFloat(document.getElementById('input-pago').value);
-                if(!pago || pago < total) return showToast("Pago insuficiente", "error");
-                
-                let pts = 0; 
+                if(metodo === 'Efectivo') {
+                    const pago = parseFloat(document.getElementById('input-pago-modal').value);
+                    if(!pago || pago < total) return showToast("Pago insuficiente", "error");
+                }
+                let pts = 0;
                 if(usePoints && clienteActivo) { 
                     const clis = DB.cli(); const idx = clis.findIndex(c => c.id === clienteActivo.id); 
-                    pts = Math.floor(total/10); 
-                    clis[idx].puntos += pts; 
-                    DB.save('coco_clientes', clis); 
+                    pts = Math.floor(total/10); clis[idx].puntos += pts; DB.save('coco_clientes', clis); 
                 }
-                saveVenta(total, 'Efectivo', pts, clienteActivo ? clienteActivo.id : 'General');
+                saveVenta(total, metodo, pts, clienteActivo ? clienteActivo.id : 'General');
             }
+            document.getElementById('modal-pago').classList.add('hidden');
             showToast("¡Venta Exitosa!", "success");
-            carrito = []; quitarCliente(); document.getElementById('input-pago').value = ''; renderCart(); renderPos();
+            
+            // Auto Print Ticket Prompt
+            if(confirm("¿Imprimir Ticket?")) printTicket(DB.ven()[0]);
+
+            carrito = []; quitarCliente(); renderCart(); renderPos(document.getElementById('buscador').value);
         }
 
         function saveVenta(total, metodo, pts, cliId) {
             const inv = DB.inv(); carrito.forEach(item => { const p = inv.find(x => x.id === item.id); if(p) p.stock -= item.cant; });
             DB.save('coco_inv', inv);
-            const ven = DB.ven(); ven.unshift({ id: Date.now(), fecha: new Date().toLocaleString(), fechaRaw: new Date(), total, metodo, puntos: pts, vendedor: currentUser.user, cliente: cliId });
-            DB.save('coco_ven', ven);
-        }
-
-        function calcCambio() {
-            const total = carrito.reduce((s,i)=>s+(i.precio*i.cant),0); const pago = parseFloat(document.getElementById('input-pago').value);
-            const lbl = document.getElementById('lbl-cambio');
-            if(pago >= total && total > 0) { lbl.classList.remove('hidden'); lbl.textContent = 'Cambio: $' + (pago-total).toFixed(2); } else lbl.classList.add('hidden');
-        }
-
-        // --- CLIENTES ---
-        function buscarCliente() {
-            const q = document.getElementById('input-client').value.trim();
-            const c = DB.cli().find(x => x.id === q || x.telefono === q);
-            if(c) { 
-                clienteActivo = c; updateClienteUI(); 
-            } else {
-                showToast("Cliente no encontrado", "error");
-            }
-        }
-        function updateClienteUI() {
-            const badge = document.getElementById('puntos-badge');
-            if(clienteActivo) {
-                document.getElementById('client-search-box').classList.add('hidden');
-                document.getElementById('client-info-box').classList.remove('hidden');
-                document.getElementById('lbl-cli-nombre').textContent = clienteActivo.nombre;
-                document.getElementById('lbl-cli-id').textContent = 'ID: ' + clienteActivo.id;
-                
-                if(usePoints) {
-                    badge.textContent = clienteActivo.puntos + ' pts'; 
-                    badge.classList.remove('hidden');
-                } else {
-                    badge.classList.add('hidden');
-                }
-            } else {
-                document.getElementById('client-search-box').classList.remove('hidden');
-                document.getElementById('client-info-box').classList.add('hidden');
-                badge.classList.add('hidden');
-            }
-            updateBtnPuntos();
-        }
-        function quitarCliente() { clienteActivo = null; updateClienteUI(); }
-        function updateBtnPuntos() {
-            const btn = document.getElementById('btn-pay-points'); const total = carrito.reduce((s,i)=>s+(i.precio*i.cant),0);
-            
-            if(!usePoints) {
-                btn.style.display = 'none'; 
-                return;
-            }
-            btn.style.display = 'block'; 
-
-            if(clienteActivo && total > 0 && clienteActivo.puntos >= total) { btn.disabled = false; btn.className = "w-full py-3 bg-green-500 text-white font-bold rounded-xl shadow-lg"; btn.textContent = `Pagar con Puntos (${clienteActivo.puntos})`; }
-            else { btn.disabled = true; btn.className = "w-full py-3 bg-slate-300 dark:bg-slate-700 text-slate-500 rounded-xl cursor-not-allowed"; btn.textContent = "Puntos insuficientes"; }
-        }
-        function modalCliente() {
-            document.getElementById('new-cli-id').value = 'WT' + Date.now().toString().slice(-5);
-            document.getElementById('modal-cliente').classList.remove('hidden');
-        }
-        function saveCliente(e) {
-            e.preventDefault(); const clis = DB.cli();
-            clis.push({ id: document.getElementById('new-cli-id').value, nombre: document.getElementById('new-cli-nom').value, telefono: document.getElementById('new-cli-tel').value, puntos: 0 });
-            DB.save('coco_clientes', clis); 
-            document.getElementById('modal-cliente').classList.add('hidden'); 
-            renderCliTable();
-            showToast("Cliente registrado", "success");
-        }
-
-        // --- GESTIÓN DE USUARIOS ---
-        function modalUsuario() {
-            document.getElementById('new-user-name').value = '';
-            document.getElementById('new-user-login').value = '';
-            document.getElementById('new-user-pass').value = '';
-            document.getElementById('modal-usuario').classList.remove('hidden');
-        }
-
-        function saveUser(e) {
-            e.preventDefault();
-            const users = DB.users();
-            const u = document.getElementById('new-user-login').value.trim();
-            if(users.some(x => x.user.toLowerCase() === u.toLowerCase())) return showToast("El usuario ya existe", "error");
-
-            const newUser = {
-                user: u,
-                name: document.getElementById('new-user-name').value,
-                pass: document.getElementById('new-user-pass').value,
-                role: document.getElementById('perm-admin').checked ? 'admin' : 'user', 
-                perms: {
-                    pos: document.getElementById('perm-pos').checked,
-                    ventas: document.getElementById('perm-ventas').checked,
-                    clientes: document.getElementById('perm-clientes').checked,
-                    inv: document.getElementById('perm-inv').checked,
-                    admin: document.getElementById('perm-admin').checked
-                }
+            const ven = DB.ven(); 
+            const nuevaVenta = { 
+                id: Date.now(), 
+                fecha: new Date().toLocaleString(), 
+                fechaRaw: new Date(), 
+                total, metodo, puntos: pts, 
+                vendedor: currentUser.user, 
+                cliente: cliId,
+                items: [...carrito] // Save items for ticket
             };
+            ven.unshift(nuevaVenta);
+            DB.save('coco_ven', ven);
+            renderHist();
+        }
+
+        // --- TICKET & EXPORT ---
+        function printTicket(v) {
+            const win = window.open('', '', 'width=300,height=600');
+            let itemsHtml = '';
+            (v.items || []).forEach(i => itemsHtml += `<div>${i.nombre} <span style="float:right">$${(i.precio*i.cant).toFixed(2)}</span><br><small>${i.cant} x $${i.precio}</small></div><hr style="border-top: 1px dashed #ccc; margin: 5px 0;">`);
             
-            users.push(newUser);
-            DB.save('coco_users', users);
-            document.getElementById('modal-usuario').classList.add('hidden');
-            renderUsersTable();
-            showToast("Usuario creado correctamente", "success");
+            win.document.write(`
+                <html><body style="font-family: monospace; font-size: 12px; width: 280px; margin: 0 auto;">
+                    <div style="text-align: center; margin-bottom: 10px;">
+                        <h2 style="margin:0">COCOLANDIA</h2>
+                        <p style="margin:0">Ticket #${v.id.toString().slice(-4)}</p>
+                        <p style="margin:0">${v.fecha}</p>
+                    </div>
+                    <hr>
+                    ${itemsHtml}
+                    <div style="text-align: right; margin-top: 10px;">
+                        <h3 style="margin:0">TOTAL: $${v.total.toFixed(2)}</h3>
+                        <p style="margin:0">Pago: ${v.metodo}</p>
+                    </div>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <p>¡Gracias por su compra!</p>
+                    </div>
+                </body></html>
+            `);
+            win.document.close();
+            win.focus();
+            setTimeout(() => { win.print(); win.close(); }, 500);
         }
 
-        function deleteUser(user) {
-            if(user === currentUser.user) return showToast("No puedes eliminarte a ti mismo", "error");
-            if(user === 'Admin') return showToast("No se puede borrar al Admin principal", "error");
-            if(confirm("¿Eliminar usuario " + user + "?")) {
-                const users = DB.users().filter(x => x.user !== user);
-                DB.save('coco_users', users);
-                renderUsersTable();
-                showToast("Usuario eliminado", "success");
-            }
+        function exportToExcel() {
+            const ventas = DB.ven();
+            let csv = "ID,Fecha,Vendedor,Cliente,Metodo,Total\n";
+            ventas.forEach(v => {
+                csv += `${v.id},"${v.fecha}",${v.vendedor},${v.cliente},${v.metodo},${v.total}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `Ventas_Cocolandia_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            showToast("Reporte descargado", "success");
         }
 
-        function renderUsersTable() { 
-            const t = document.getElementById('table-users'); 
-            t.innerHTML = ''; 
-            DB.users().forEach(u => {
-                const p = u.perms || { admin: u.role === 'admin' };
-                let badges = '';
-                if(p.admin) badges += '<span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-bold mr-1">ADMIN</span>';
-                else {
-                    if(p.pos) badges += '<span class="bg-slate-100 text-slate-600 px-1 rounded text-[10px] mr-1">Caja</span>';
-                    if(p.ventas) badges += '<span class="bg-slate-100 text-slate-600 px-1 rounded text-[10px] mr-1">Hist</span>';
-                    if(p.inv) badges += '<span class="bg-slate-100 text-slate-600 px-1 rounded text-[10px] mr-1">Inv</span>';
-                }
-
+        // --- INVENTARIO CRUD ---
+        function renderInvTable() {
+            const t = document.getElementById('table-inv'); t.innerHTML = '';
+            DB.inv().forEach(p => {
+                const canEdit = currentUser && currentUser.perms.inv;
                 t.innerHTML += `
                 <tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                    <td class="p-4 text-xs font-bold">${u.user}</td>
-                    <td class="p-4 text-xs">${u.name}</td>
-                    <td class="p-4">${badges}</td>
+                    <td class="p-4 text-xs font-bold">${p.id}</td>
+                    <td class="p-4 text-xs">${p.nombre}</td>
+                    <td class="p-4 text-xs"><span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-[10px] uppercase font-bold">${p.cat || 'General'}</span></td>
+                    <td class="p-4 text-xs">$${p.precio}</td>
+                    <td class="p-4 text-xs font-bold ${p.stock<=5?'text-red-500':''}">${p.stock}</td>
                     <td class="p-4 text-right">
-                        ${u.user !== 'Admin' && u.user !== currentUser.user ? 
-                        `<button onclick="deleteUser('${u.user}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>` : ''}
+                        ${canEdit ? `<button onclick="editProduct('${p.id}')" class="text-blue-500 hover:text-blue-700 mr-2"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteProduct('${p.id}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>` : ''}
                     </td>
-                </tr>`; 
-            }); 
+                </tr>`;
+            });
         }
 
-        // --- TABLAS AUXILIARES ---
+        function modalProducto(id = null) {
+            document.getElementById('modal-producto').classList.remove('hidden');
+            if(id) {
+                const p = DB.inv().find(x => x.id === id);
+                document.getElementById('modal-prod-title').textContent = "Editar Producto";
+                document.getElementById('prod-id').value = p.id; document.getElementById('prod-id').disabled = true;
+                document.getElementById('prod-nom').value = p.nombre;
+                document.getElementById('prod-precio').value = p.precio;
+                document.getElementById('prod-stock').value = p.stock;
+                document.getElementById('prod-cat').value = p.cat || 'General';
+            } else {
+                document.getElementById('modal-prod-title').textContent = "Nuevo Producto";
+                document.getElementById('prod-id').value = ''; document.getElementById('prod-id').disabled = false;
+                document.getElementById('prod-nom').value = '';
+                document.getElementById('prod-precio').value = '';
+                document.getElementById('prod-stock').value = '';
+                document.getElementById('prod-cat').value = 'General';
+            }
+        }
+
+        function saveProduct(e) {
+            e.preventDefault();
+            const inv = DB.inv();
+            const id = document.getElementById('prod-id').value;
+            const isEdit = document.getElementById('prod-id').disabled;
+
+            if(!isEdit && inv.some(x => x.id === id)) return showToast("Ese código ya existe", "error");
+
+            const prodData = {
+                id: id,
+                nombre: document.getElementById('prod-nom').value,
+                precio: parseFloat(document.getElementById('prod-precio').value),
+                stock: parseInt(document.getElementById('prod-stock').value),
+                cat: document.getElementById('prod-cat').value
+            };
+
+            if(isEdit) {
+                const idx = inv.findIndex(x => x.id === id);
+                inv[idx] = prodData;
+            } else {
+                inv.push(prodData);
+            }
+            DB.save('coco_inv', inv);
+            document.getElementById('modal-producto').classList.add('hidden');
+            renderInvTable(); renderPos(document.getElementById('buscador').value);
+            showToast("Producto guardado", "success");
+        }
+
+        function editProduct(id) { modalProducto(id); }
+        function deleteProduct(id) {
+            if(confirm("¿Eliminar producto?")) {
+                const inv = DB.inv().filter(x => x.id !== id);
+                DB.save('coco_inv', inv);
+                renderInvTable(); renderPos(document.getElementById('buscador').value);
+                showToast("Producto eliminado", "success");
+            }
+        }
+
+        // --- SISTEMA CLIENTES Y USUARIOS (Mantener igual a v5) ---
+        function buscarCliente() { const q = document.getElementById('input-client').value.trim(); const c = DB.cli().find(x => x.id === q || x.telefono === q); if(c) { clienteActivo = c; updateClienteUI(); } else showToast("Cliente no encontrado", "error"); }
+        function updateClienteUI() { 
+            const badge = document.getElementById('puntos-badge');
+            if(clienteActivo) { document.getElementById('client-search-box').classList.add('hidden'); document.getElementById('client-info-box').classList.remove('hidden'); document.getElementById('lbl-cli-nombre').textContent = clienteActivo.nombre; document.getElementById('lbl-cli-id').textContent = 'ID: ' + clienteActivo.id; if(usePoints) { badge.textContent = clienteActivo.puntos + ' pts'; badge.classList.remove('hidden'); } else badge.classList.add('hidden'); }
+            else { document.getElementById('client-search-box').classList.remove('hidden'); document.getElementById('client-info-box').classList.add('hidden'); badge.classList.add('hidden'); }
+        }
+        function quitarCliente() { clienteActivo = null; updateClienteUI(); }
+        function modalCliente() { document.getElementById('new-cli-id').value = 'WT' + Date.now().toString().slice(-5); document.getElementById('modal-cliente').classList.remove('hidden'); }
+        function saveCliente(e) { e.preventDefault(); const clis = DB.cli(); clis.push({ id: document.getElementById('new-cli-id').value, nombre: document.getElementById('new-cli-nom').value, telefono: document.getElementById('new-cli-tel').value, puntos: 0 }); DB.save('coco_clientes', clis); document.getElementById('modal-cliente').classList.add('hidden'); renderCliTable(); showToast("Cliente registrado", "success"); }
         function renderCliTable() { const t = document.getElementById('table-clientes'); t.innerHTML = ''; DB.cli().forEach(c => t.innerHTML += `<tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50"><td class="p-3 text-xs font-bold">${c.id}</td><td class="p-3 text-xs">${c.nombre}</td><td class="p-3 text-xs text-orange-600 font-bold">${c.puntos} pts</td></tr>`); }
-        function renderHist() { const l = document.getElementById('list-ventas'); l.innerHTML = ''; DB.ven().forEach(v => l.innerHTML += `<div class="bg-white dark:bg-slate-800 p-3 border dark:border-slate-700 rounded text-xs flex justify-between dark:text-slate-300"><div><b>#${v.id.toString().slice(-4)}</b> - ${v.vendedor}</div><b>$${v.total.toFixed(2)}</b></div>`); }
+        function renderHist() { const l = document.getElementById('list-ventas'); l.innerHTML = ''; DB.ven().forEach(v => l.innerHTML += `<div class="bg-white dark:bg-slate-800 p-3 border dark:border-slate-700 rounded text-xs flex justify-between dark:text-slate-300 items-center"><div><b>#${v.id.toString().slice(-4)}</b> - ${v.vendedor}<br><span class="text-[10px] text-slate-400">${v.fecha} • ${v.metodo}</span></div><div class="text-right"><b class="text-lg">$${v.total.toFixed(2)}</b><br><button onclick='printTicket(${JSON.stringify(v)})' class="text-blue-500 hover:underline text-[10px]"><i class="fas fa-print"></i> Ticket</button></div></div>`); }
+        
+        // Users
+        function modalUsuario() { document.getElementById('new-user-name').value = ''; document.getElementById('new-user-login').value = ''; document.getElementById('new-user-pass').value = ''; document.getElementById('modal-usuario').classList.remove('hidden'); }
+        function saveUser(e) { e.preventDefault(); const users = DB.users(); const u = document.getElementById('new-user-login').value.trim(); if(users.some(x => x.user.toLowerCase() === u.toLowerCase())) return showToast("El usuario ya existe", "error"); const newUser = { user: u, name: document.getElementById('new-user-name').value, pass: document.getElementById('new-user-pass').value, role: document.getElementById('perm-admin').checked ? 'admin' : 'user', perms: { pos: document.getElementById('perm-pos').checked, ventas: document.getElementById('perm-ventas').checked, clientes: document.getElementById('perm-clientes').checked, inv: document.getElementById('perm-inv').checked, admin: document.getElementById('perm-admin').checked } }; users.push(newUser); DB.save('coco_users', users); document.getElementById('modal-usuario').classList.add('hidden'); renderUsersTable(); showToast("Usuario creado", "success"); }
+        function deleteUser(user) { if(user === currentUser.user) return showToast("No puedes auto-eliminarte", "error"); if(user === 'Admin') return showToast("Admin principal protegido", "error"); if(confirm("¿Eliminar usuario?")) { const users = DB.users().filter(x => x.user !== user); DB.save('coco_users', users); renderUsersTable(); showToast("Usuario eliminado", "success"); } }
+        function renderUsersTable() { const t = document.getElementById('table-users'); t.innerHTML = ''; DB.users().forEach(u => { const p = u.perms || { admin: u.role === 'admin' }; let badges = ''; if(p.admin) badges += '<span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-bold mr-1">ADMIN</span>'; else { if(p.pos) badges += '<span class="bg-slate-100 text-slate-600 px-1 rounded text-[10px] mr-1">Caja</span>'; if(p.ventas) badges += '<span class="bg-slate-100 text-slate-600 px-1 rounded text-[10px] mr-1">Hist</span>'; if(p.inv) badges += '<span class="bg-slate-100 text-slate-600 px-1 rounded text-[10px] mr-1">Inv</span>'; } t.innerHTML += `<tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50"><td class="p-4 text-xs font-bold">${u.user}</td><td class="p-4 text-xs">${u.name}</td><td class="p-4">${badges}</td><td class="p-4 text-right">${u.user !== 'Admin' && u.user !== currentUser.user ? `<button onclick="deleteUser('${u.user}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>` : ''}</td></tr>`; }); }
+        
+        // --- CIERRE DE CAJA ---
+        function prepararCierreCaja() { if (!currentUser) return; const ahora = new Date(); const inicio = new Date(currentUser.inicioTurno); const difMs = ahora - inicio; const horas = Math.floor(difMs / 3600000); const minutos = Math.floor((difMs % 3600000) / 60000); const ventasTurno = DB.ven().filter(v => v.vendedor === currentUser.user && new Date(v.fechaRaw || v.id) >= inicio); const totalEfec = ventasTurno.filter(v => v.metodo === 'Efectivo').reduce((s, v) => s + v.total, 0); const totalOtros = ventasTurno.filter(v => v.metodo !== 'Efectivo' && v.metodo !== 'Puntos').reduce((s, v) => s + v.total, 0); const data = { vendedor: currentUser.user, nombre: currentUser.name, fechaInicio: inicio.toLocaleString(), fechaCierre: ahora.toLocaleString(), tiempo: `${horas}h ${minutos}m`, efectivo: totalEfec, otros: totalOtros, total: totalEfec + totalOtros, numVentas: ventasTurno.length }; const modal = document.createElement('div'); modal.id = 'modal-cierre'; modal.className = 'fixed inset-0 bg-slate-900 z-[100] flex items-center justify-center p-4 backdrop-blur-sm'; modal.innerHTML = `<div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl p-6 font-mono text-sm dark:text-slate-300"><div class="text-center border-b-2 border-dashed border-slate-200 pb-4 mb-4"><h2 class="text-xl font-black text-slate-800 dark:text-white">CIERRE DE TURNO</h2></div><div class="space-y-1 mb-4"><p><b>CAJERO:</b> ${data.nombre}</p><p><b>TIEMPO:</b> ${data.tiempo}</p></div><div class="border-b-2 border-dashed border-slate-200 pb-4 mb-4"><div class="flex justify-between"><span>Efectivo</span> <span>$${data.efectivo.toFixed(2)}</span></div><div class="flex justify-between"><span>Tarj/Transf</span> <span>$${data.otros.toFixed(2)}</span></div><div class="flex justify-between font-bold text-lg mt-2 pt-2 border-t"><span>TOTAL</span> <span>$${data.total.toFixed(2)}</span></div></div><button onclick='confirmarCierre(${JSON.stringify(data)})' class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold">CERRAR TURNO</button></div>`; document.body.appendChild(modal); }
+        function confirmarCierre(data) { const turnos = DB.turnos(); turnos.push(data); DB.save('coco_turnos', turnos); showToast("Turno cerrado", "success"); document.getElementById('modal-cierre').remove(); logout(); }
+        function factoryReset() { if(!currentUser || !currentUser.perms.admin) return showToast("No tienes permiso", "error"); if(confirm("¿RESET DE FÁBRICA TOTAL?")) { DB.clear(); location.reload(); } }
     </script>
 </body>
 </html>
