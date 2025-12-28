@@ -3,428 +3,313 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cocolandia v6.5 - PRO MANAGEMENT</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Cocolandia v8.0 - Final Funcional</title>
     
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        dark: '#0f172a',
-                        panel: '#1e293b',
-                        surface: '#263345',
-                        primary: '#4f46e5', // Indigo-600
-                        accent: '#8b5cf6'  // Violet-500
+                        dark: '#0f172a',       // Fondo
+                        panel: '#1e293b',      // Tarjetas/Sidebar
+                        header: '#263345',     // Cabecera Tabla
+                        primary: '#4f46e5',    // Botón Azul
+                        primaryHover: '#4338ca',
+                        danger: '#ef4444',     // Botón Rojo
+                        success: '#10b981'     // Estado Activo
                     }
                 }
             }
         }
     </script>
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        
-        /* Scrollbar personalizada */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-        /* Animaciones */
-        .modal-enter { opacity: 0; transform: scale(0.95); pointer-events: none; }
-        .modal-active { opacity: 1; transform: scale(1); pointer-events: auto; }
+    <style>
+        /* Estilos base para asegurar que funcione aunque falle Tailwind */
+        body { font-family: system-ui, -apple-system, sans-serif; }
         
-        /* Toast Notification */
-        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 100; }
-        .toast { transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
-        .toast.show { transform: translateX(0); }
+        /* Ocultar modal por defecto */
+        .modal-hidden { display: none !important; }
+        .modal-flex { display: flex !important; }
+
+        /* Animación suave */
+        .fade-in { animation: fadeIn 0.2s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
-<body class="bg-dark text-slate-300 h-screen w-screen overflow-hidden flex text-sm selection:bg-primary selection:text-white">
+<body class="bg-dark text-slate-300 h-screen w-screen overflow-hidden flex">
 
-    <aside class="w-64 bg-panel flex flex-col border-r border-slate-700/50 shrink-0 relative z-20">
-        <div class="p-5 flex-1">
-            <div class="flex items-center gap-3 mb-10 select-none">
-                <div class="bg-gradient-to-br from-primary to-accent p-2.5 rounded-xl text-white shadow-lg shadow-primary/30">
-                    <i class="fa-solid fa-store text-lg"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-white text-base tracking-tight">Cocolandia</h1>
-                    <div class="flex items-center gap-2">
-                        <span class="text-[10px] text-slate-400 font-mono">v6.5 PRO</span>
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    </div>
-                </div>
+    <aside class="w-64 bg-panel flex flex-col border-r border-slate-700/50 shrink-0">
+        <div class="p-5">
+            <div class="flex items-center gap-3 mb-10">
+                <div class="bg-primary p-2 rounded-lg text-white shadow-lg"><i class="fa-solid fa-store"></i></div>
+                <h1 class="font-bold text-white text-lg">Cocolandia</h1>
             </div>
 
-            <nav class="space-y-1">
-                <a href="#" class="nav-item group flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-cash-register w-5 text-center group-hover:text-primary transition"></i> Caja
-                </a>
-                <a href="#" class="nav-item group flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-users w-5 text-center group-hover:text-primary transition"></i> Clientes
-                </a>
-                <a href="#" class="nav-item group flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-boxes-stacked w-5 text-center group-hover:text-primary transition"></i> Inventario
-                </a>
-                <a href="#" class="nav-item group flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-chart-pie w-5 text-center group-hover:text-primary transition"></i> Reportes
-                </a>
+            <nav class="space-y-2">
+                <a href="#" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-700/50 transition"><i class="fa-solid fa-cash-register w-6"></i> Caja</a>
+                <a href="#" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-700/50 transition"><i class="fa-solid fa-users w-6"></i> Clientes</a>
+                <a href="#" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-700/50 transition"><i class="fa-solid fa-boxes-stacked w-6"></i> Inventario</a>
                 
-                <div class="my-4 border-t border-slate-700/50"></div>
-                <div class="mb-2 px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Administración</div>
+                <div class="h-px bg-slate-700 my-4"></div>
                 
-                <a href="#" class="flex items-center gap-3 p-3 rounded-lg bg-primary/10 text-primary border border-primary/20 font-medium relative overflow-hidden">
-                    <div class="absolute inset-0 bg-primary/5"></div>
-                    <i class="fa-solid fa-user-gear w-5 text-center relative z-10"></i> <span class="relative z-10">Usuarios</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-screwdriver-wrench w-5 text-center group-hover:text-primary transition"></i> Configuración
+                <a href="#" class="flex items-center gap-3 p-3 rounded-lg bg-primary/10 text-primary border border-primary/30 font-bold">
+                    <i class="fa-solid fa-user-gear w-6"></i> Usuarios
                 </a>
             </nav>
         </div>
-        
-        <div class="p-4 border-t border-slate-700/50">
-            <div class="bg-dark/50 rounded-lg p-3 flex items-center gap-3 mb-3 border border-slate-700/50">
-                <img src="https://ui-avatars.com/api/?name=Admin&background=4f46e5&color=fff" class="w-8 h-8 rounded-full">
-                <div class="overflow-hidden">
-                    <div class="text-white font-bold text-xs truncate">Administrador</div>
-                    <div class="text-emerald-400 text-[10px]">Online</div>
-                </div>
-            </div>
-            <button class="w-full flex items-center justify-center gap-2 p-2 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition text-xs font-bold uppercase tracking-wide border border-transparent hover:border-red-500/20">
-                <i class="fa-solid fa-power-off"></i> <span>Cerrar Sesión</span>
+        <div class="mt-auto p-4 border-t border-slate-700">
+            <button class="w-full flex items-center justify-center gap-2 text-danger hover:bg-danger/10 p-2 rounded transition">
+                <i class="fa-solid fa-power-off"></i> Salir
             </button>
         </div>
     </aside>
 
-    <main class="flex-1 p-8 overflow-y-auto relative z-10 bg-dark">
-        <div class="flex flex-col md:flex-row md:justify-between md:items-end mb-8 gap-4">
+    <main class="flex-1 p-8 flex flex-col h-full overflow-hidden bg-dark">
+        
+        <div class="flex justify-between items-end mb-6">
             <div>
-                <h2 class="text-3xl font-bold text-white tracking-tight">Gestión de Usuarios</h2>
-                <p class="text-slate-500 mt-1">Controla quién tiene acceso a la terminal POS y sus privilegios.</p>
+                <h2 class="text-3xl font-bold text-white">Gestión de Usuarios</h2>
+                <p class="text-slate-400">Control de acceso al sistema POS.</p>
             </div>
-            <div class="flex gap-3">
-                <button onclick="app.refreshData()" class="bg-panel hover:bg-slate-700 text-slate-300 px-4 py-2.5 rounded-lg font-medium border border-slate-600 transition">
-                    <i class="fa-solid fa-rotate-right"></i>
-                </button>
-                <button onclick="app.openModal()" class="bg-primary hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-medium shadow-lg shadow-primary/25 transition flex items-center gap-2 active:scale-95">
-                    <i class="fa-solid fa-plus"></i> Agregar Usuario
-                </button>
-            </div>
+            <button onclick="abrirModal()" class="bg-primary hover:bg-primaryHover text-white px-5 py-2.5 rounded-lg font-bold shadow-lg transition flex items-center gap-2">
+                <i class="fa-solid fa-plus"></i> Nuevo Usuario
+            </button>
         </div>
 
-        <div class="bg-panel p-4 rounded-xl border border-slate-700/50 mb-6 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-xl">
-            <div class="relative w-full sm:max-w-md">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-500"></i>
-                <input type="text" id="searchInput" onkeyup="app.filterUsers()" placeholder="Buscar por nombre, usuario o rol..." 
-                    class="bg-dark/50 w-full rounded-lg pl-10 pr-4 py-2.5 text-white border border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition placeholder-slate-600">
+        <div class="bg-panel p-4 rounded-xl border border-slate-700 mb-6 flex gap-4">
+            <div class="relative flex-1">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500"></i>
+                <input type="text" id="buscador" onkeyup="filtrarTabla()" placeholder="Buscar usuario..." class="w-full bg-dark border border-slate-600 rounded-lg py-2 pl-10 pr-4 text-white outline-none focus:border-primary">
             </div>
-            
-            <div class="flex gap-2 w-full sm:w-auto">
-                <select id="roleFilter" onchange="app.filterUsers()" class="bg-dark/50 text-slate-300 border border-slate-700 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-primary w-full sm:w-auto">
-                    <option value="">Todos los Roles</option>
-                    <option value="ADMIN">Administradores</option>
-                    <option value="CAJERO">Cajeros</option>
-                    <option value="ALMACEN">Almacén</option>
-                </select>
-            </div>
+            <select id="filtro" onchange="filtrarTabla()" class="bg-dark border border-slate-600 rounded-lg px-4 text-white outline-none">
+                <option value="">Todos los Roles</option>
+                <option value="ADMIN">Admins</option>
+                <option value="CAJERO">Cajeros</option>
+                <option value="ALMACEN">Almacén</option>
+            </select>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="bg-panel p-4 rounded-xl border border-slate-700/50 flex items-center gap-4">
-                <div class="p-3 bg-blue-500/10 text-blue-400 rounded-lg"><i class="fa-solid fa-users text-xl"></i></div>
-                <div><div class="text-slate-400 text-xs uppercase font-bold">Total Usuarios</div><div class="text-2xl font-bold text-white" id="stat-total">0</div></div>
-            </div>
-            <div class="bg-panel p-4 rounded-xl border border-slate-700/50 flex items-center gap-4">
-                <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg"><i class="fa-solid fa-user-check text-xl"></i></div>
-                <div><div class="text-slate-400 text-xs uppercase font-bold">Activos</div><div class="text-2xl font-bold text-white" id="stat-active">0</div></div>
-            </div>
-            <div class="bg-panel p-4 rounded-xl border border-slate-700/50 flex items-center gap-4">
-                <div class="p-3 bg-indigo-500/10 text-indigo-400 rounded-lg"><i class="fa-solid fa-shield-halved text-xl"></i></div>
-                <div><div class="text-slate-400 text-xs uppercase font-bold">Admins</div><div class="text-2xl font-bold text-white" id="stat-admin">0</div></div>
-            </div>
-        </div>
-
-        <div class="bg-panel rounded-xl border border-slate-700 shadow-2xl overflow-hidden relative min-h-[300px]">
-            <div class="overflow-x-auto">
+        <div class="flex-1 bg-panel rounded-xl border border-slate-700 overflow-hidden flex flex-col">
+            <div class="overflow-auto">
                 <table class="w-full text-left border-collapse">
-                    <thead class="bg-surface text-slate-400 uppercase text-xs sticky top-0 z-10">
+                    <thead class="bg-header text-slate-400 uppercase text-xs sticky top-0">
                         <tr>
-                            <th class="px-6 py-4 font-semibold tracking-wider">Usuario</th>
-                            <th class="px-6 py-4 font-semibold tracking-wider">Nombre Completo</th>
-                            <th class="px-6 py-4 font-semibold tracking-wider">Rol</th>
-                            <th class="px-6 py-4 font-semibold tracking-wider">Estado</th>
-                            <th class="px-6 py-4 font-semibold tracking-wider text-right">Acciones</th>
+                            <th class="p-4">Usuario</th>
+                            <th class="p-4">Nombre</th>
+                            <th class="p-4">Rol</th>
+                            <th class="p-4">Estado</th>
+                            <th class="p-4 text-right">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="userTableBody" class="divide-y divide-slate-700/50 text-slate-300">
+                    <tbody id="tablaBody" class="divide-y divide-slate-700/50 text-sm">
                         </tbody>
                 </table>
-            </div>
-            <div id="emptyState" class="hidden absolute inset-0 flex flex-col items-center justify-center text-slate-500">
-                <i class="fa-solid fa-ghost text-4xl mb-3 opacity-50"></i>
-                <p>No se encontraron usuarios.</p>
+                
+                <div id="vacio" class="hidden p-10 text-center text-slate-500">
+                    <i class="fa-solid fa-ghost text-3xl mb-2"></i>
+                    <p>No se encontraron resultados.</p>
+                </div>
             </div>
         </div>
     </main>
 
-    <div id="userModal" class="modal-enter fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm transition-all duration-200">
-        <div class="bg-panel w-full max-w-lg rounded-xl border border-slate-700 shadow-2xl transform transition-all scale-100 m-4">
+    <div id="modal" class="modal-hidden fixed inset-0 z-50 items-center justify-center bg-black/80 backdrop-blur-sm fade-in">
+        <div class="bg-panel w-full max-w-md rounded-xl border border-slate-600 shadow-2xl p-6 relative">
             
-            <div class="flex justify-between items-center p-6 border-b border-slate-700/50">
-                <h3 class="text-xl font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-user-pen text-primary"></i> <span id="modalTitle">Nuevo Usuario</span>
-                </h3>
-                <button onclick="app.closeModal()" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="modalTitulo" class="text-xl font-bold text-white">Nuevo Usuario</h3>
+                <button onclick="cerrarModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
 
-            <form id="userForm" onsubmit="app.saveUser(event)" class="p-6 space-y-5">
+            <form id="formUsuario" onsubmit="guardarUsuario(event)">
                 <input type="hidden" id="userId">
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="mb-4">
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Usuario</label>
+                    <input type="text" id="campoUsuario" required class="w-full bg-dark border border-slate-600 rounded p-2.5 text-white focus:border-primary outline-none">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Nombre Completo</label>
+                    <input type="text" id="campoNombre" required class="w-full bg-dark border border-slate-600 rounded p-2.5 text-white focus:border-primary outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Usuario (Login)</label>
-                        <input type="text" id="username" required class="w-full bg-dark border border-slate-600 rounded-lg p-2.5 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition" placeholder="ej. cajero1">
+                        <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Rol</label>
+                        <select id="campoRol" class="w-full bg-dark border border-slate-600 rounded p-2.5 text-white outline-none">
+                            <option value="CAJERO">Cajero</option>
+                            <option value="ADMIN">Admin</option>
+                            <option value="ALMACEN">Almacén</option>
+                        </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Rol de Acceso</label>
-                        <select id="role" class="w-full bg-dark border border-slate-600 rounded-lg p-2.5 text-white focus:border-primary outline-none">
-                            <option value="CAJERO">Cajero (Punto de Venta)</option>
-                            <option value="ADMIN">Administrador Total</option>
-                            <option value="ALMACEN">Jefe de Almacén</option>
+                        <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Estado</label>
+                        <select id="campoActivo" class="w-full bg-dark border border-slate-600 rounded p-2.5 text-white outline-none">
+                            <option value="true">Activo</option>
+                            <option value="false">Inactivo</option>
                         </select>
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1.5 uppercase">Nombre Completo</label>
-                    <input type="text" id="fullname" required class="w-full bg-dark border border-slate-600 rounded-lg p-2.5 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition" placeholder="ej. Roberto Gómez Bolaños">
-                </div>
-
-                <div class="flex items-center gap-3 bg-dark/50 p-3 rounded-lg border border-slate-700">
-                    <div class="flex items-center h-5">
-                        <input id="isActive" type="checkbox" checked class="w-4 h-4 text-primary bg-slate-700 border-slate-600 rounded focus:ring-primary focus:ring-2">
-                    </div>
-                    <div class="text-sm">
-                        <label for="isActive" class="font-medium text-slate-300">Usuario Activo</label>
-                        <p class="text-xs text-slate-500">Si se desactiva, no podrá ingresar al sistema.</p>
-                    </div>
-                </div>
-
-                <div class="pt-4 flex gap-3">
-                    <button type="button" onclick="app.closeModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-medium py-2.5 rounded-lg transition">Cancelar</button>
-                    <button type="submit" class="flex-1 bg-primary hover:bg-indigo-500 text-white font-bold py-2.5 rounded-lg shadow-lg shadow-primary/25 transition">Guardar Datos</button>
+                <div class="flex gap-3 mt-6">
+                    <button type="button" onclick="cerrarModal()" class="flex-1 bg-slate-700 text-white py-2 rounded hover:bg-slate-600">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-primary text-white py-2 rounded hover:bg-primaryHover font-bold">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="toast-container"></div>
-
     <script>
-        const app = {
-            data: [],
-            
-            init() {
-                // 1. Cargar datos del LocalStorage o usar datos dummy iniciales
-                const storedData = localStorage.getItem('cocolandia_users');
-                if (storedData) {
-                    this.data = JSON.parse(storedData);
-                } else {
-                    // Datos de prueba si está vacío
-                    this.data = [
-                        { id: 1, username: 'admin', fullname: 'Administrador Principal', role: 'ADMIN', active: true },
-                        { id: 2, username: 'cajero01', fullname: 'Juan Pérez', role: 'CAJERO', active: true },
-                        { id: 3, username: 'almacen', fullname: 'Laura Torres', role: 'ALMACEN', active: false }
-                    ];
-                    this.saveToDisk();
-                }
-                this.renderTable();
-                this.updateStats();
-            },
+        // --- 1. DATOS (Simulación de BD) ---
+        let usuarios = [
+            { id: 1, usuario: 'admin', nombre: 'Administrador General', rol: 'ADMIN', activo: true },
+            { id: 2, usuario: 'cajero1', nombre: 'Roberto Gómez', rol: 'CAJERO', activo: true },
+            { id: 3, usuario: 'bodega', nombre: 'Laura Torres', rol: 'ALMACEN', activo: false }
+        ];
 
-            saveToDisk() {
-                localStorage.setItem('cocolandia_users', JSON.stringify(this.data));
-                this.updateStats();
-            },
+        // Intentar cargar de localStorage si existe
+        const guardados = localStorage.getItem('cocolandia_v8');
+        if(guardados) {
+            usuarios = JSON.parse(guardados);
+        }
 
-            // --- RENDERIZADO ---
-            renderTable(filterText = '', filterRole = '') {
-                const tbody = document.getElementById('userTableBody');
-                const emptyState = document.getElementById('emptyState');
-                tbody.innerHTML = '';
+        // --- 2. FUNCIONES PRINCIPALES ---
 
-                let filtered = this.data.filter(u => {
-                    const matchText = u.username.toLowerCase().includes(filterText) || u.fullname.toLowerCase().includes(filterText);
-                    const matchRole = filterRole === '' || u.role === filterRole;
-                    return matchText && matchRole;
-                });
+        // Renderizar la tabla
+        function dibujarTabla(lista = usuarios) {
+            const tbody = document.getElementById('tablaBody');
+            const avisoVacio = document.getElementById('vacio');
+            tbody.innerHTML = '';
 
-                if (filtered.length === 0) {
-                    emptyState.classList.remove('hidden');
-                } else {
-                    emptyState.classList.add('hidden');
-                    
-                    filtered.forEach(user => {
-                        const row = document.createElement('tr');
-                        row.className = 'hover:bg-slate-700/30 transition group border-b border-slate-700/50 last:border-0';
-                        
-                        // Icono según rol
-                        let icon = 'fa-user';
-                        let colorClass = 'bg-slate-700 text-slate-400';
-                        if(user.role === 'ADMIN') { icon = 'fa-crown'; colorClass = 'bg-indigo-500/20 text-indigo-400'; }
-                        if(user.role === 'ALMACEN') { icon = 'fa-box'; colorClass = 'bg-orange-500/20 text-orange-400'; }
-
-                        // Badges
-                        const roleBadge = user.role === 'ADMIN' 
-                            ? `<span class="bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded text-[10px] font-bold border border-indigo-500/20 tracking-wider">ADMIN</span>`
-                            : `<span class="bg-slate-700/50 text-slate-300 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-600 tracking-wider">${user.role}</span>`;
-
-                        const statusBadge = user.active
-                            ? `<span class="flex items-center gap-1.5 text-emerald-400 text-xs font-bold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></span> Activo</span>`
-                            : `<span class="flex items-center gap-1.5 text-slate-500 text-xs font-bold"><span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span> Inactivo</span>`;
-
-                        row.innerHTML = `
-                            <td class="px-6 py-4 font-medium text-white">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-full ${colorClass} flex items-center justify-center shadow-inner"><i class="fa-solid ${icon}"></i></div>
-                                    <span class="font-mono text-sm">${user.username}</span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">${user.fullname}</td>
-                            <td class="px-6 py-4">${roleBadge}</td>
-                            <td class="px-6 py-4">${statusBadge}</td>
-                            <td class="px-6 py-4 text-right">
-                                <div class="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end gap-2">
-                                    <button onclick="app.editUser(${user.id})" class="p-2 text-slate-400 hover:text-white hover:bg-slate-600 rounded-lg transition" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button onclick="app.deleteUser(${user.id})" class="p-2 text-slate-400 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                }
-            },
-
-            updateStats() {
-                document.getElementById('stat-total').innerText = this.data.length;
-                document.getElementById('stat-active').innerText = this.data.filter(u => u.active).length;
-                document.getElementById('stat-admin').innerText = this.data.filter(u => u.role === 'ADMIN').length;
-            },
-
-            filterUsers() {
-                const text = document.getElementById('searchInput').value.toLowerCase();
-                const role = document.getElementById('roleFilter').value;
-                this.renderTable(text, role);
-            },
-
-            // --- MODAL Y CRUD ---
-            openModal(editId = null) {
-                const modal = document.getElementById('userModal');
-                const title = document.getElementById('modalTitle');
-                const form = document.getElementById('userForm');
-                
-                modal.classList.remove('modal-enter');
-                modal.classList.add('modal-active');
-                
-                if (editId) {
-                    const user = this.data.find(u => u.id === editId);
-                    title.innerText = "Editar Usuario";
-                    document.getElementById('userId').value = user.id;
-                    document.getElementById('username').value = user.username;
-                    document.getElementById('fullname').value = user.fullname;
-                    document.getElementById('role').value = user.role;
-                    document.getElementById('isActive').checked = user.active;
-                } else {
-                    title.innerText = "Nuevo Usuario";
-                    form.reset();
-                    document.getElementById('userId').value = '';
-                }
-            },
-
-            closeModal() {
-                const modal = document.getElementById('userModal');
-                modal.classList.remove('modal-active');
-                modal.classList.add('modal-enter');
-            },
-
-            saveUser(e) {
-                e.preventDefault();
-                const id = document.getElementById('userId').value;
-                const username = document.getElementById('username').value;
-                const fullname = document.getElementById('fullname').value;
-                const role = document.getElementById('role').value;
-                const active = document.getElementById('isActive').checked;
-
-                if (id) {
-                    // Editar existente
-                    const index = this.data.findIndex(u => u.id == id);
-                    this.data[index] = { id: parseInt(id), username, fullname, role, active };
-                    this.showToast('Usuario actualizado correctamente', 'success');
-                } else {
-                    // Crear nuevo
-                    const newId = this.data.length > 0 ? Math.max(...this.data.map(u => u.id)) + 1 : 1;
-                    this.data.push({ id: newId, username, fullname, role, active });
-                    this.showToast('Usuario creado exitosamente', 'success');
-                }
-
-                this.saveToDisk();
-                this.renderTable();
-                this.closeModal();
-                this.filterUsers(); // Re-aplicar filtros si existen
-            },
-
-            deleteUser(id) {
-                if(confirm('¿Estás seguro de eliminar este usuario? Esta acción no se puede deshacer.')) {
-                    this.data = this.data.filter(u => u.id !== id);
-                    this.saveToDisk();
-                    this.renderTable();
-                    this.filterUsers();
-                    this.showToast('Usuario eliminado', 'error');
-                }
-            },
-
-            refreshData() {
-                const icon = document.querySelector('.fa-rotate-right');
-                icon.classList.add('fa-spin');
-                setTimeout(() => {
-                    this.init(); // Recargar
-                    this.filterUsers();
-                    icon.classList.remove('fa-spin');
-                    this.showToast('Datos actualizados', 'info');
-                }, 500);
-            },
-
-            // --- UTILIDADES ---
-            showToast(msg, type = 'info') {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                
-                let bg = 'bg-slate-700';
-                let icon = 'fa-info-circle';
-                if(type === 'success') { bg = 'bg-emerald-600'; icon = 'fa-check-circle'; }
-                if(type === 'error') { bg = 'bg-red-600'; icon = 'fa-triangle-exclamation'; }
-
-                toast.className = `toast mb-3 p-4 rounded-lg shadow-lg flex items-center gap-3 text-white min-w-[300px] ${bg}`;
-                toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span class="font-medium">${msg}</span>`;
-                
-                container.appendChild(toast);
-                
-                // Animación entrada
-                requestAnimationFrame(() => { toast.classList.add('show'); });
-
-                // Remover después de 3s
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                    setTimeout(() => toast.remove(), 300);
-                }, 3000);
+            if(lista.length === 0) {
+                avisoVacio.classList.remove('hidden');
+                return;
             }
-        };
+            avisoVacio.classList.add('hidden');
 
-        // Iniciar App
-        document.addEventListener('DOMContentLoaded', () => app.init());
+            lista.forEach(user => {
+                // Colores según rol
+                let badgeClass = 'bg-slate-700 text-slate-300';
+                if(user.rol === 'ADMIN') badgeClass = 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30';
+                if(user.rol === 'ALMACEN') badgeClass = 'bg-orange-500/20 text-orange-300 border border-orange-500/30';
+
+                // HTML de la fila
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-700/30 border-b border-slate-700/50';
+                tr.innerHTML = `
+                    <td class="p-4 font-bold text-white">${user.usuario}</td>
+                    <td class="p-4 text-slate-300">${user.nombre}</td>
+                    <td class="p-4"><span class="px-2 py-1 rounded text-xs font-bold ${badgeClass}">${user.rol}</span></td>
+                    <td class="p-4">
+                        ${user.activo 
+                            ? '<span class="text-success text-xs font-bold"><i class="fa-solid fa-circle text-[8px]"></i> ACTIVO</span>' 
+                            : '<span class="text-slate-500 text-xs font-bold"><i class="fa-solid fa-circle text-[8px]"></i> INACTIVO</span>'}
+                    </td>
+                    <td class="p-4 text-right">
+                        <button onclick="editar(${user.id})" class="text-slate-400 hover:text-white mx-1 p-2"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="borrar(${user.id})" class="text-slate-400 hover:text-danger mx-1 p-2"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Filtrado
+        function filtrarTabla() {
+            const texto = document.getElementById('buscador').value.toLowerCase();
+            const rol = document.getElementById('filtro').value;
+
+            const filtrados = usuarios.filter(u => {
+                const coincideTexto = u.usuario.toLowerCase().includes(texto) || u.nombre.toLowerCase().includes(texto);
+                const coincideRol = rol === '' || u.rol === rol;
+                return coincideTexto && coincideRol;
+            });
+
+            dibujarTabla(filtrados);
+        }
+
+        // --- 3. MODAL Y CRUD ---
+
+        function abrirModal() {
+            document.getElementById('formUsuario').reset();
+            document.getElementById('userId').value = ''; // Limpiar ID para modo crear
+            document.getElementById('modalTitulo').innerText = 'Nuevo Usuario';
+            
+            const modal = document.getElementById('modal');
+            modal.classList.remove('modal-hidden');
+            modal.classList.add('modal-flex');
+        }
+
+        function cerrarModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.add('modal-hidden');
+            modal.classList.remove('modal-flex');
+        }
+
+        function editar(id) {
+            const user = usuarios.find(u => u.id === id);
+            if(!user) return;
+
+            // Llenar formulario
+            document.getElementById('userId').value = user.id;
+            document.getElementById('campoUsuario').value = user.usuario;
+            document.getElementById('campoNombre').value = user.nombre;
+            document.getElementById('campoRol').value = user.rol;
+            document.getElementById('campoActivo').value = user.activo.toString();
+            document.getElementById('modalTitulo').innerText = 'Editar Usuario';
+
+            // Mostrar modal
+            const modal = document.getElementById('modal');
+            modal.classList.remove('modal-hidden');
+            modal.classList.add('modal-flex');
+        }
+
+        function guardarUsuario(e) {
+            e.preventDefault(); // Evitar recarga de pagina
+
+            const id = document.getElementById('userId').value;
+            const usuarioVal = document.getElementById('campoUsuario').value;
+            const nombreVal = document.getElementById('campoNombre').value;
+            const rolVal = document.getElementById('campoRol').value;
+            const activoVal = document.getElementById('campoActivo').value === 'true';
+
+            if(id) {
+                // EDITAR
+                const index = usuarios.findIndex(u => u.id == id);
+                if(index !== -1) {
+                    usuarios[index] = { id: parseInt(id), usuario: usuarioVal, nombre: nombreVal, rol: rolVal, activo: activoVal };
+                }
+            } else {
+                // CREAR
+                const newId = usuarios.length > 0 ? Math.max(...usuarios.map(u => u.id)) + 1 : 1;
+                usuarios.push({ id: newId, usuario: usuarioVal, nombre: nombreVal, rol: rolVal, activo: activoVal });
+            }
+
+            // Guardar en navegador y repintar
+            localStorage.setItem('cocolandia_v8', JSON.stringify(usuarios));
+            dibujarTabla();
+            filtrarTabla(); // Por si hay filtros activos
+            cerrarModal();
+        }
+
+        function borrar(id) {
+            if(confirm('¿Eliminar usuario?')) {
+                usuarios = usuarios.filter(u => u.id !== id);
+                localStorage.setItem('cocolandia_v8', JSON.stringify(usuarios));
+                dibujarTabla();
+                filtrarTabla();
+            }
+        }
+
+        // --- 4. INICIO AUTOMÁTICO ---
+        dibujarTabla();
+
     </script>
 </body>
 </html>
