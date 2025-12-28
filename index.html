@@ -29,7 +29,7 @@
         body { user-select: none; }
         input { user-select: text; }
         /* Transiciones suaves para modo nocturno */
-        body, div, nav, aside, input, button { transition: background-color 0.3s, border-color 0.3s, color 0.3s; }
+        body, div, nav, aside, input, button, tr, td { transition: background-color 0.3s, border-color 0.3s, color 0.3s; }
     </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 h-screen font-sans overflow-hidden">
@@ -89,7 +89,7 @@
                 </button>
             </div>
 
-            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+            <nav class="flex-1 p-4 space-y-2 overflow-y-auto" id="nav-container">
                 <button onclick="nav('pos')" id="btn-pos" class="nav-btn w-full flex items-center p-4 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
                     <i class="fas fa-cash-register w-6 text-center"></i><span class="ml-3 font-medium">Caja</span>
                 </button>
@@ -112,9 +112,6 @@
             </nav>
 
             <div class="p-4 border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 space-y-2">
-                <button onclick="checarActualizacion()" class="w-full flex items-center justify-center p-3 rounded-xl text-green-600 hover:bg-green-100 dark:hover:bg-green-900/30 font-bold text-sm transition-all border border-green-200 dark:border-green-900">
-                    <i class="fas fa-sync-alt mr-2"></i> Actualizar App
-                </button>
                 <button onclick="prepararCierreCaja()" class="w-full flex items-center justify-center p-3 rounded-xl text-indigo-600 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 font-bold text-sm transition-all border border-indigo-200 dark:border-indigo-900">
                     <i class="fas fa-file-invoice-dollar mr-2"></i> Cierre de Caja
                 </button>
@@ -172,10 +169,22 @@
             </div>
 
             <div id="view-users" class="view-section hidden flex-1 p-8 overflow-y-auto">
-                <h2 class="text-3xl font-bold mb-8 dark:text-white">Usuarios</h2>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold dark:text-white">Usuarios</h2>
+                    <button onclick="modalUsuario()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 dark:shadow-none">
+                        <i class="fas fa-plus mr-2"></i> Nuevo Usuario
+                    </button>
+                </div>
                 <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border dark:border-slate-700 overflow-hidden">
                     <table class="w-full text-left dark:text-slate-300">
-                        <thead class="bg-slate-50 dark:bg-slate-700 border-b dark:border-slate-600"><tr><th class="p-4">Usuario</th><th class="p-4">Nombre</th><th class="p-4">Rol</th></tr></thead>
+                        <thead class="bg-slate-50 dark:bg-slate-700 border-b dark:border-slate-600">
+                            <tr>
+                                <th class="p-4">Usuario</th>
+                                <th class="p-4">Nombre</th>
+                                <th class="p-4">Permisos</th>
+                                <th class="p-4 text-right">Acciones</th>
+                            </tr>
+                        </thead>
                         <tbody id="table-users"></tbody>
                     </table>
                 </div>
@@ -207,7 +216,6 @@
             <div id="view-ajustes" class="view-section hidden flex-1 p-8 overflow-y-auto">
                 <h2 class="text-3xl font-bold mb-8 dark:text-white">Ajustes</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    
                     <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex justify-between items-center">
                         <div>
                             <h3 class="font-bold text-lg dark:text-white">Modo Nocturno</h3>
@@ -217,7 +225,6 @@
                             <div id="toggle-circle" class="w-6 h-6 bg-white rounded-full absolute top-1 left-1 shadow-md transform transition-transform"></div>
                         </button>
                     </div>
-
                     <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
                         <h3 class="font-bold text-lg text-red-600 mb-2">Zona de Peligro</h3>
                         <p class="text-slate-500 text-sm mb-4">Borrar todos los productos, clientes y ventas. Esta acción no se puede deshacer.</p>
@@ -225,7 +232,6 @@
                             <i class="fas fa-trash-alt mr-2"></i> Restablecer Fábrica
                         </button>
                     </div>
-
                 </div>
             </div>
 
@@ -245,16 +251,51 @@
         </div>
     </div>
 
+    <div id="modal-usuario" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-md p-8 shadow-2xl border dark:border-slate-700">
+            <h3 class="text-2xl font-bold mb-6 dark:text-white">Nuevo Usuario</h3>
+            <form onsubmit="saveUser(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <input id="new-user-name" required class="w-full border dark:border-slate-600 dark:bg-slate-700 dark:text-white p-3 rounded-xl" placeholder="Nombre Completo">
+                    <input id="new-user-login" required class="w-full border dark:border-slate-600 dark:bg-slate-700 dark:text-white p-3 rounded-xl" placeholder="Usuario (Login)">
+                </div>
+                <input id="new-user-pass" required type="text" class="w-full border dark:border-slate-600 dark:bg-slate-700 dark:text-white p-3 rounded-xl font-mono" placeholder="Contraseña">
+                
+                <div class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-xl border dark:border-slate-600">
+                    <p class="text-xs font-bold text-slate-400 uppercase mb-3">Asignar Permisos</p>
+                    <div class="grid grid-cols-2 gap-y-2 text-sm dark:text-slate-300">
+                        <label class="flex items-center"><input type="checkbox" id="perm-pos" class="mr-2" checked> Caja (Cobrar)</label>
+                        <label class="flex items-center"><input type="checkbox" id="perm-ventas" class="mr-2"> Historial</label>
+                        <label class="flex items-center"><input type="checkbox" id="perm-clientes" class="mr-2"> Clientes</label>
+                        <label class="flex items-center"><input type="checkbox" id="perm-inv" class="mr-2"> Inventario</label>
+                        <label class="flex items-center text-indigo-600 font-bold"><input type="checkbox" id="perm-admin" class="mr-2"> ADMIN (Usuarios)</label>
+                    </div>
+                </div>
+
+                <button class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-lg">Crear Usuario</button>
+                <button type="button" onclick="document.getElementById('modal-usuario').classList.add('hidden')" class="w-full py-2 text-slate-500 hover:text-slate-700 dark:text-slate-400">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
     <script>
         // --- BASE DE DATOS ---
+        // Estructura de usuarios actualizada para soportar permisos.
+        // Si no existen permisos (datos viejos), se asignan defaults en tiempo de ejecución.
         const DB = {
             inv: () => JSON.parse(localStorage.getItem('coco_inv')) || [{id:'001',nombre:'Coca Cola',precio:18,stock:50}],
             cli: () => JSON.parse(localStorage.getItem('coco_clientes')) || [],
             ven: () => JSON.parse(localStorage.getItem('coco_ven')) || [],
-            users: () => JSON.parse(localStorage.getItem('coco_users')) || [
-                { user: 'Admin', pass: '2508', role: 'admin', name: 'Administrador' },
-                { user: 'cajero', pass: '0000', role: 'user', name: 'Cajero' }
-            ],
+            users: () => {
+                let users = JSON.parse(localStorage.getItem('coco_users'));
+                if (!users) {
+                    users = [
+                        { user: 'Admin', pass: '2508', name: 'Administrador', perms: { pos:true, ventas:true, clientes:true, inv:true, admin:true } },
+                        { user: 'cajero', pass: '0000', name: 'Cajero', perms: { pos:true, ventas:false, clientes:true, inv:false, admin:false } }
+                    ];
+                }
+                return users;
+            },
             turnos: () => JSON.parse(localStorage.getItem('coco_turnos')) || [],
             save: (key, data) => localStorage.setItem(key, JSON.stringify(data)),
             clear: () => localStorage.clear()
@@ -302,50 +343,53 @@
             }
         }
 
-        // --- SISTEMA DE ACTUALIZACIÓN ---
-        async function checarActualizacion() {
-            const url = "https://raw.githubusercontent.com/maltech445-design/Cocolandia-POS/refs/heads/main/index%20copia.html";
-            try {
-                const res = await fetch(url);
-                if (!res.ok) throw new Error("Error al descargar");
-                const nuevoCodigo = await res.text();
-                
-                if (nuevoCodigo.length !== document.documentElement.outerHTML.length) {
-                    if (confirm("¡Nueva versión disponible en GitHub! ¿Deseas descargarla ahora?")) {
-                        const blob = new Blob([nuevoCodigo], { type: 'text/html' });
-                        const a = document.createElement('a');
-                        a.href = URL.createObjectURL(blob);
-                        a.download = 'index.html'; 
-                        a.click();
-                        alert("Actualización descargada. Reemplaza tu archivo actual por el nuevo y recarga la página.");
-                    }
-                } else {
-                    alert("Cocolandia ya está actualizado.");
-                }
-            } catch (e) {
-                alert("Error al conectar con GitHub. Verifica tu conexión.");
-            }
-        }
-
         // --- LOGIN & SESIÓN ---
         function login(e) {
             e.preventDefault();
             const u = document.getElementById('login-user').value;
             const p = document.getElementById('login-pass').value;
-            const found = DB.users().find(x => x.user === u && x.pass === p);
+            let found = DB.users().find(x => x.user.toLowerCase() === u.toLowerCase() && x.pass === p);
 
             if (found) {
+                // Migración 'on-the-fly' para usuarios viejos sin permisos definidos
+                if(!found.perms) {
+                    const isAdmin = found.role === 'admin';
+                    found.perms = {
+                        pos: true,
+                        clientes: true,
+                        ventas: isAdmin,
+                        inv: isAdmin,
+                        admin: isAdmin
+                    };
+                }
+
                 currentUser = {...found, inicioTurno: new Date()};
                 document.getElementById('screen-login').classList.add('hidden');
                 document.getElementById('screen-app').classList.remove('hidden');
                 document.getElementById('user-display-name').textContent = found.name.toUpperCase();
                 
-                if(currentUser.role === 'admin') document.getElementById('menu-admin-users').classList.remove('hidden');
-                nav('pos'); renderPos(); renderCliTable(); renderHist(); renderUsersTable();
+                applyUserPermissions(); // Aplicar permisos a la UI
+                nav('pos'); 
+                renderPos(); renderCliTable(); renderHist(); 
+                if(currentUser.perms.admin) renderUsersTable();
                 
-                // Re-aplicar estado visual del toggle si entramos a ajustes
                 if(document.getElementById('view-ajustes') && isDarkMode) applyDarkMode(true);
             } else { alert("Datos incorrectos"); }
+        }
+
+        function applyUserPermissions() {
+            // Muestra u oculta botones del menú según permisos
+            const p = currentUser.perms;
+            const toggle = (id, show) => {
+                const el = document.getElementById(id);
+                if(el) show ? el.classList.remove('hidden') : el.classList.add('hidden');
+            };
+
+            toggle('btn-pos', p.pos);
+            toggle('btn-ventas', p.ventas);
+            toggle('btn-clientes', p.clientes);
+            toggle('btn-inventario', p.inv);
+            toggle('menu-admin-users', p.admin); // El menú entero de admin
         }
 
         function logout() {
@@ -361,16 +405,13 @@
             const target = document.getElementById('view-' + vista);
             if(target) target.classList.remove('hidden');
             
-            // Reset nav buttons
             document.querySelectorAll('.nav-btn').forEach(btn => 
                 btn.className = 'nav-btn w-full flex items-center p-4 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all'
             );
             
-            // Active state
             const active = document.getElementById('btn-' + vista);
             if(active) active.className = 'nav-btn w-full flex items-center p-4 rounded-xl bg-indigo-50 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 font-bold';
             
-            // Si vamos a ajustes, asegurarnos que el toggle se vea bien
             if(vista === 'ajustes') applyDarkMode(isDarkMode);
         }
 
@@ -539,9 +580,80 @@
             DB.save('coco_clientes', clis); document.getElementById('modal-cliente').classList.add('hidden'); renderCliTable();
         }
 
+        // --- GESTIÓN DE USUARIOS ---
+        function modalUsuario() {
+            document.getElementById('new-user-name').value = '';
+            document.getElementById('new-user-login').value = '';
+            document.getElementById('new-user-pass').value = '';
+            document.getElementById('modal-usuario').classList.remove('hidden');
+        }
+
+        function saveUser(e) {
+            e.preventDefault();
+            const users = DB.users();
+            const u = document.getElementById('new-user-login').value.trim();
+            if(users.some(x => x.user.toLowerCase() === u.toLowerCase())) return alert("Ese usuario ya existe");
+
+            const newUser = {
+                user: u,
+                name: document.getElementById('new-user-name').value,
+                pass: document.getElementById('new-user-pass').value,
+                role: document.getElementById('perm-admin').checked ? 'admin' : 'user', // Backup compatibility
+                perms: {
+                    pos: document.getElementById('perm-pos').checked,
+                    ventas: document.getElementById('perm-ventas').checked,
+                    clientes: document.getElementById('perm-clientes').checked,
+                    inv: document.getElementById('perm-inv').checked,
+                    admin: document.getElementById('perm-admin').checked
+                }
+            };
+            
+            users.push(newUser);
+            DB.save('coco_users', users);
+            document.getElementById('modal-usuario').classList.add('hidden');
+            renderUsersTable();
+            alert("Usuario creado correctamente");
+        }
+
+        function deleteUser(user) {
+            if(user === currentUser.user) return alert("No puedes eliminar tu propio usuario activo");
+            if(user === 'Admin') return alert("El Admin principal no se puede borrar");
+            if(confirm("¿Eliminar usuario " + user + "?")) {
+                const users = DB.users().filter(x => x.user !== user);
+                DB.save('coco_users', users);
+                renderUsersTable();
+            }
+        }
+
+        function renderUsersTable() { 
+            const t = document.getElementById('table-users'); 
+            t.innerHTML = ''; 
+            DB.users().forEach(u => {
+                // Si no tiene perms (usuario viejo), simular para mostrar en tabla
+                const p = u.perms || { admin: u.role === 'admin' };
+                let badges = '';
+                if(p.admin) badges += '<span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-bold mr-1">ADMIN</span>';
+                else {
+                    if(p.pos) badges += '<span class="bg-slate-100 text-slate-600 px-1 rounded text-[10px] mr-1">Caja</span>';
+                    if(p.ventas) badges += '<span class="bg-slate-100 text-slate-600 px-1 rounded text-[10px] mr-1">Hist</span>';
+                    if(p.inv) badges += '<span class="bg-slate-100 text-slate-600 px-1 rounded text-[10px] mr-1">Inv</span>';
+                }
+
+                t.innerHTML += `
+                <tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                    <td class="p-4 text-xs font-bold">${u.user}</td>
+                    <td class="p-4 text-xs">${u.name}</td>
+                    <td class="p-4">${badges}</td>
+                    <td class="p-4 text-right">
+                        ${u.user !== 'Admin' && u.user !== currentUser.user ? 
+                        `<button onclick="deleteUser('${u.user}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>` : ''}
+                    </td>
+                </tr>`; 
+            }); 
+        }
+
         // --- TABLAS AUXILIARES ---
         function renderCliTable() { const t = document.getElementById('table-clientes'); t.innerHTML = ''; DB.cli().forEach(c => t.innerHTML += `<tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50"><td class="p-3 text-xs font-bold">${c.id}</td><td class="p-3 text-xs">${c.nombre}</td><td class="p-3 text-xs text-orange-600 font-bold">${c.puntos} pts</td></tr>`); }
-        function renderUsersTable() { const t = document.getElementById('table-users'); t.innerHTML = ''; DB.users().forEach(u => t.innerHTML += `<tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50"><td class="p-4 text-xs font-bold">${u.user}</td><td class="p-4 text-xs">${u.name}</td><td class="p-4 text-xs uppercase font-black">${u.role}</td></tr>`); }
         function renderHist() { const l = document.getElementById('list-ventas'); l.innerHTML = ''; DB.ven().forEach(v => l.innerHTML += `<div class="bg-white dark:bg-slate-800 p-3 border dark:border-slate-700 rounded text-xs flex justify-between dark:text-slate-300"><div><b>#${v.id.toString().slice(-4)}</b> - ${v.vendedor}</div><b>$${v.total.toFixed(2)}</b></div>`); }
     </script>
 </body>
