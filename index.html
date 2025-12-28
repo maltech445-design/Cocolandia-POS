@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cocolandia v6.0.0 - Professional POS</title>
+    <title>Cocolandia v6.1.0 - Gestión Total</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -37,7 +37,6 @@
         .toggle-checkbox:checked { right: 0; border-color: #4f46e5; }
         .toggle-checkbox:checked + .toggle-label { background-color: #4f46e5; }
         
-        /* Estilos para impresión de ticket */
         @media print {
             body * { visibility: hidden; }
             #ticket-print-area, #ticket-print-area * { visibility: visible; }
@@ -56,7 +55,7 @@
                     <i class="fas fa-store"></i>
                 </div>
                 <h1 class="text-4xl font-black text-slate-800 tracking-tight">Cocolandia</h1>
-                <p class="text-slate-500 font-medium">Versión 6.0.0</p>
+                <p class="text-slate-500 font-medium">Versión 6.1.0</p>
             </div>
             <form onsubmit="login(event)" class="space-y-5 text-left">
                 <div>
@@ -142,8 +141,7 @@
                             <i class="fas fa-search text-slate-400 ml-2"></i>
                             <input type="text" id="buscador" oninput="renderPos(this.value)" placeholder="Buscar producto..." class="flex-1 ml-4 outline-none text-lg bg-transparent dark:text-white" autofocus>
                         </div>
-                        <div id="cat-filters" class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-                            </div>
+                        <div id="cat-filters" class="flex gap-2 overflow-x-auto pb-1 no-scrollbar"></div>
                     </div>
                     <div id="grid-productos" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 pb-20"></div>
                 </div>
@@ -175,8 +173,7 @@
                             <span id="lbl-total" class="text-4xl font-black text-slate-800 dark:text-white">$0.00</span>
                         </div>
                         <button onclick="abrirModalPago()" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg flex justify-between px-6 items-center">
-                            <span>COBRAR</span>
-                            <i class="fas fa-arrow-right"></i>
+                            <span>COBRAR</span><i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
                 </div>
@@ -239,6 +236,10 @@
                                 <div class="flex items-center"><div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 flex items-center justify-center mr-3"><i class="fas fa-moon"></i></div><div><div class="font-bold dark:text-white">Modo Nocturno</div><div class="text-xs text-slate-500 dark:text-slate-400">Interfaz oscura</div></div></div>
                                 <div class="relative inline-block w-12 h-6 align-middle select-none"><input type="checkbox" id="toggle-dark" onclick="toggleDarkMode()" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-slate-300 appearance-none cursor-pointer transition-all duration-300"/><label for="toggle-dark" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 cursor-pointer transition-colors duration-300"></label></div>
                             </div>
+                            <div class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors">
+                                <div class="flex items-center"><div class="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center mr-3"><i class="fas fa-print"></i></div><div><div class="font-bold dark:text-white">Impresión de Tickets</div><div class="text-xs text-slate-500 dark:text-slate-400">Preguntar al finalizar venta</div></div></div>
+                                <div class="relative inline-block w-12 h-6 align-middle select-none"><input type="checkbox" id="toggle-printer" onclick="togglePrinter()" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-slate-300 appearance-none cursor-pointer transition-all duration-300"/><label for="toggle-printer" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 cursor-pointer transition-colors duration-300"></label></div>
+                            </div>
                             <div id="box-toggle-points" class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors">
                                 <div class="flex items-center"><div class="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300 flex items-center justify-center mr-3"><i class="fas fa-star"></i></div><div><div class="font-bold dark:text-white">Sistema de Puntos</div><div class="text-xs text-slate-500 dark:text-slate-400">Acumular crédito en compras</div></div></div>
                                 <div class="relative inline-block w-12 h-6 align-middle select-none"><input type="checkbox" id="toggle-points" onclick="togglePoints()" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-slate-300 appearance-none cursor-pointer transition-all duration-300"/><label for="toggle-points" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 cursor-pointer transition-colors duration-300"></label></div>
@@ -278,13 +279,16 @@
 
     <div id="modal-usuario" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-md p-8 shadow-2xl border dark:border-slate-700">
-            <h3 class="text-2xl font-bold mb-6 dark:text-white">Nuevo Usuario</h3>
+            <h3 id="modal-user-title" class="text-2xl font-bold mb-6 dark:text-white">Nuevo Usuario</h3>
             <form onsubmit="saveUser(event)" class="space-y-4">
+                <input type="hidden" id="edit-user-idx" value="-1">
                 <div class="grid grid-cols-2 gap-4">
                     <input id="new-user-name" required class="w-full border dark:border-slate-600 dark:bg-slate-700 dark:text-white p-3 rounded-xl" placeholder="Nombre Completo">
                     <input id="new-user-login" required class="w-full border dark:border-slate-600 dark:bg-slate-700 dark:text-white p-3 rounded-xl" placeholder="Usuario (Login)">
                 </div>
-                <input id="new-user-pass" required type="text" class="w-full border dark:border-slate-600 dark:bg-slate-700 dark:text-white p-3 rounded-xl font-mono" placeholder="Contraseña">
+                <input id="new-user-pass" type="text" class="w-full border dark:border-slate-600 dark:bg-slate-700 dark:text-white p-3 rounded-xl font-mono" placeholder="Contraseña">
+                <div class="text-[10px] text-slate-400 -mt-2 ml-1 hidden" id="hint-pass">Dejar en blanco para no cambiar</div>
+                
                 <div class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-xl border dark:border-slate-600">
                     <p class="text-xs font-bold text-slate-400 uppercase mb-3">Asignar Permisos</p>
                     <div class="grid grid-cols-2 gap-y-2 text-sm dark:text-slate-300">
@@ -295,7 +299,7 @@
                         <label class="flex items-center text-indigo-600 font-bold"><input type="checkbox" id="perm-admin" class="mr-2"> ADMIN (Usuarios)</label>
                     </div>
                 </div>
-                <button class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-lg">Crear Usuario</button>
+                <button class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-lg">Guardar Usuario</button>
                 <button type="button" onclick="document.getElementById('modal-usuario').classList.add('hidden')" class="w-full py-2 text-slate-500 hover:text-slate-700 dark:text-slate-400">Cancelar</button>
             </form>
         </div>
@@ -316,16 +320,12 @@
                         <button onclick="selMetodo('Transferencia')" id="btn-met-transf" class="metodo-btn bg-slate-100 dark:bg-slate-700 p-3 rounded-xl border-2 border-transparent hover:border-indigo-500 focus:border-indigo-500 flex flex-col items-center gap-1 transition-all"><i class="fas fa-mobile-alt text-purple-500 text-xl"></i><span class="text-xs font-bold">Transf.</span></button>
                     </div>
                 </div>
-                
                 <div id="pago-efectivo-box" class="animate-slide-in">
                     <label class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Dinero Recibido</label>
                     <input type="number" id="input-pago-modal" oninput="calcCambioModal()" class="w-full p-4 text-2xl font-bold border-2 border-slate-200 dark:border-slate-600 rounded-xl mt-1 outline-none focus:border-indigo-500 bg-transparent" placeholder="$0.00">
                     <div id="lbl-cambio-modal" class="text-right font-bold text-green-600 mt-2 h-6"></div>
                 </div>
-
-                <button id="btn-puntos-modal" onclick="procesarPago('Puntos')" class="hidden w-full p-3 bg-orange-100 text-orange-700 rounded-xl font-bold border border-orange-200 hover:bg-orange-200 transition-colors">
-                    <i class="fas fa-star mr-2"></i> Pagar con Puntos
-                </button>
+                <button id="btn-puntos-modal" onclick="procesarPago('Puntos')" class="hidden w-full p-3 bg-orange-100 text-orange-700 rounded-xl font-bold border border-orange-200 hover:bg-orange-200 transition-colors"><i class="fas fa-star mr-2"></i> Pagar con Puntos</button>
             </div>
             <div class="p-4 bg-slate-50 dark:bg-slate-900 border-t dark:border-slate-700 flex gap-3">
                 <button onclick="document.getElementById('modal-pago').classList.add('hidden')" class="flex-1 py-3 text-slate-500 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">Cancelar</button>
@@ -345,12 +345,7 @@
                     <input id="prod-stock" type="number" class="w-full bg-slate-50 dark:bg-slate-700 dark:text-white border dark:border-slate-600 p-2 rounded" placeholder="Stock" required>
                 </div>
                 <select id="prod-cat" class="w-full bg-slate-50 dark:bg-slate-700 dark:text-white border dark:border-slate-600 p-2 rounded">
-                    <option value="General">General</option>
-                    <option value="Bebidas">Bebidas</option>
-                    <option value="Alimentos">Alimentos</option>
-                    <option value="Snacks">Snacks</option>
-                    <option value="Servicios">Servicios</option>
-                    <option value="Otros">Otros</option>
+                    <option value="General">General</option><option value="Bebidas">Bebidas</option><option value="Alimentos">Alimentos</option><option value="Snacks">Snacks</option><option value="Servicios">Servicios</option><option value="Otros">Otros</option>
                 </select>
                 <button class="w-full py-2 bg-indigo-600 text-white rounded font-bold hover:bg-indigo-700 mt-2">Guardar Producto</button>
                 <button type="button" onclick="document.getElementById('modal-producto').classList.add('hidden')" class="w-full py-2 text-slate-500 hover:text-slate-700 dark:text-slate-400">Cancelar</button>
@@ -361,21 +356,12 @@
     <script>
         // --- BASE DE DATOS ---
         const DB = {
-            inv: () => JSON.parse(localStorage.getItem('coco_inv')) || [
-                {id:'001', nombre:'Coca Cola 600ml', precio:18, stock:50, cat:'Bebidas'},
-                {id:'002', nombre:'Sabritas Sal 45g', precio:17, stock:30, cat:'Snacks'},
-                {id:'003', nombre:'Agua Ciel 1L', precio:12, stock:40, cat:'Bebidas'}
-            ],
+            inv: () => JSON.parse(localStorage.getItem('coco_inv')) || [ {id:'001', nombre:'Coca Cola 600ml', precio:18, stock:50, cat:'Bebidas'}, {id:'002', nombre:'Sabritas Sal 45g', precio:17, stock:30, cat:'Snacks'} ],
             cli: () => JSON.parse(localStorage.getItem('coco_clientes')) || [],
             ven: () => JSON.parse(localStorage.getItem('coco_ven')) || [],
             users: () => {
                 let users = JSON.parse(localStorage.getItem('coco_users'));
-                if (!users) {
-                    users = [
-                        { user: 'Admin', pass: '2508', name: 'Administrador', perms: { pos:true, ventas:true, clientes:true, inv:true, admin:true } },
-                        { user: 'cajero', pass: '0000', name: 'Cajero', perms: { pos:true, ventas:false, clientes:true, inv:false, admin:false } }
-                    ];
-                }
+                if (!users) { users = [ { user: 'Admin', pass: '2508', name: 'Administrador', perms: { pos:true, ventas:true, clientes:true, inv:true, admin:true } }, { user: 'cajero', pass: '0000', name: 'Cajero', perms: { pos:true, ventas:false, clientes:true, inv:false, admin:false } } ]; }
                 return users;
             },
             turnos: () => JSON.parse(localStorage.getItem('coco_turnos')) || [],
@@ -389,349 +375,210 @@
         let currentUser = null;
         let isDarkMode = localStorage.getItem('coco_dark') === 'true';
         let usePoints = localStorage.getItem('coco_points') !== 'false'; 
+        let usePrinter = localStorage.getItem('coco_printer') !== 'false';
         let currentMetodo = 'Efectivo';
         let activeCat = 'Todos';
 
-        // --- INICIO ---
         window.onload = () => {
             if(isDarkMode) applyDarkMode(true);
             document.getElementById('toggle-points').checked = usePoints;
+            document.getElementById('toggle-printer').checked = usePrinter;
             document.getElementById('toggle-dark').checked = isDarkMode;
             renderCategories();
         };
 
         // --- UTILIDADES ---
         function showToast(msg, type = 'info') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            const bgClass = type === 'error' ? 'bg-red-500' : (type === 'success' ? 'bg-green-500' : 'bg-slate-800');
+            const container = document.getElementById('toast-container'); const toast = document.createElement('div'); const bgClass = type === 'error' ? 'bg-red-500' : (type === 'success' ? 'bg-green-500' : 'bg-slate-800');
             toast.className = `${bgClass} text-white p-4 rounded-xl shadow-2xl flex items-center animate-slide-in pointer-events-auto min-w-[300px]`;
             toast.innerHTML = `<div class="mr-3 text-xl"><i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i></div><div class="font-bold text-sm">${msg}</div>`;
-            container.appendChild(toast);
-            setTimeout(() => { toast.classList.replace('animate-slide-in', 'animate-fade-out'); setTimeout(() => toast.remove(), 300); }, 3000);
+            container.appendChild(toast); setTimeout(() => { toast.classList.replace('animate-slide-in', 'animate-fade-out'); setTimeout(() => toast.remove(), 300); }, 3000);
         }
-
         function toggleDarkMode() { isDarkMode = !isDarkMode; localStorage.setItem('coco_dark', isDarkMode); applyDarkMode(isDarkMode); }
-        function applyDarkMode(enable) {
-            const html = document.documentElement; const chk = document.getElementById('toggle-dark');
-            if(enable) { html.classList.add('dark'); if(chk) chk.checked = true; } else { html.classList.remove('dark'); if(chk) chk.checked = false; }
-        }
+        function applyDarkMode(enable) { const html = document.documentElement; const chk = document.getElementById('toggle-dark'); if(enable) { html.classList.add('dark'); if(chk) chk.checked = true; } else { html.classList.remove('dark'); if(chk) chk.checked = false; } }
         function togglePoints() { usePoints = !usePoints; localStorage.setItem('coco_points', usePoints); if(clienteActivo) updateClienteUI(); }
+        function togglePrinter() { usePrinter = !usePrinter; localStorage.setItem('coco_printer', usePrinter); }
 
         // --- LOGIN & NAV ---
         function login(e) {
-            e.preventDefault();
-            const u = document.getElementById('login-user').value;
-            const p = document.getElementById('login-pass').value;
+            e.preventDefault(); const u = document.getElementById('login-user').value; const p = document.getElementById('login-pass').value;
             let found = DB.users().find(x => x.user.toLowerCase() === u.toLowerCase() && x.pass === p);
             if (found) {
-                if(!found.perms) { // Migration fix
-                    const isAdmin = found.role === 'admin';
-                    found.perms = { pos: true, clientes: true, ventas: isAdmin, inv: isAdmin, admin: isAdmin };
-                }
+                if(!found.perms) { const isAdmin = found.role === 'admin'; found.perms = { pos: true, clientes: true, ventas: isAdmin, inv: isAdmin, admin: isAdmin }; }
                 currentUser = {...found, inicioTurno: new Date()};
-                document.getElementById('screen-login').classList.add('hidden');
-                document.getElementById('screen-app').classList.remove('hidden');
-                document.getElementById('user-display-name').textContent = found.name.toUpperCase();
+                document.getElementById('screen-login').classList.add('hidden'); document.getElementById('screen-app').classList.remove('hidden'); document.getElementById('user-display-name').textContent = found.name.toUpperCase();
                 applyUserPermissions();
-                
-                // Smart Redirect
-                if(found.perms.pos) nav('pos');
-                else if(found.perms.ventas) nav('ventas');
-                else if(found.perms.inv) nav('inventario');
-                else nav('ajustes');
-
+                if(found.perms.pos) nav('pos'); else if(found.perms.ventas) nav('ventas'); else if(found.perms.inv) nav('inventario'); else nav('ajustes');
                 renderPos(); renderCliTable(); renderHist(); if(currentUser.perms.admin) renderUsersTable(); renderInvTable();
                 if(document.getElementById('toggle-dark')) document.getElementById('toggle-dark').checked = isDarkMode;
                 if(document.getElementById('toggle-points')) document.getElementById('toggle-points').checked = usePoints;
+                if(document.getElementById('toggle-printer')) document.getElementById('toggle-printer').checked = usePrinter;
             } else { showToast("Credenciales incorrectas", "error"); }
         }
-
         function applyUserPermissions() {
-            const p = currentUser.perms;
-            const toggle = (id, show) => { const el = document.getElementById(id); if(el) show ? el.classList.remove('hidden') : el.classList.add('hidden'); };
+            const p = currentUser.perms; const toggle = (id, show) => { const el = document.getElementById(id); if(el) show ? el.classList.remove('hidden') : el.classList.add('hidden'); };
             toggle('btn-pos', p.pos); toggle('btn-ventas', p.ventas); toggle('btn-clientes', p.clientes); toggle('btn-inventario', p.inv);
-            toggle('menu-admin-users', p.admin); toggle('box-toggle-points', p.admin); toggle('btn-factory-reset', p.admin); toggle('msg-no-perm', !p.admin);
-            toggle('btn-add-prod', p.inv); // CRUD protection
+            toggle('menu-admin-users', p.admin); toggle('box-toggle-points', p.admin); toggle('btn-factory-reset', p.admin); toggle('msg-no-perm', !p.admin); toggle('btn-add-prod', p.inv);
         }
-
-        function logout() {
-            currentUser = null; document.getElementById('screen-app').classList.add('hidden'); document.getElementById('screen-login').classList.remove('hidden');
-            document.getElementById('login-user').value = ''; document.getElementById('login-pass').value = '';
-        }
-
+        function logout() { currentUser = null; document.getElementById('screen-app').classList.add('hidden'); document.getElementById('screen-login').classList.remove('hidden'); document.getElementById('login-user').value = ''; document.getElementById('login-pass').value = ''; }
         function nav(vista) {
             const permMap = { 'pos':'pos', 'ventas':'ventas', 'clientes':'clientes', 'inventario':'inv', 'users':'admin', 'ajustes':null };
             if(currentUser && permMap[vista] && !currentUser.perms[permMap[vista]]) return showToast("🚫 Acceso Denegado", "error");
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            document.getElementById('view-' + vista).classList.remove('hidden');
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden')); document.getElementById('view-' + vista).classList.remove('hidden');
             document.querySelectorAll('.nav-btn').forEach(btn => btn.className = 'nav-btn w-full flex items-center p-4 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all');
             const active = document.getElementById('btn-' + vista); if(active) active.className = 'nav-btn w-full flex items-center p-4 rounded-xl bg-indigo-50 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 font-bold';
-            if(vista === 'ajustes') { applyDarkMode(isDarkMode); document.getElementById('toggle-points').checked = usePoints; }
+            if(vista === 'ajustes') { applyDarkMode(isDarkMode); document.getElementById('toggle-points').checked = usePoints; document.getElementById('toggle-printer').checked = usePrinter; }
         }
 
-        // --- POS & CATEGORÍAS ---
+        // --- POS ---
         function renderCategories() {
-            const cats = ['Todos', 'General', 'Bebidas', 'Alimentos', 'Snacks', 'Servicios', 'Otros'];
-            const con = document.getElementById('cat-filters'); con.innerHTML = '';
-            cats.forEach(c => {
-                con.innerHTML += `<button onclick="filterCat('${c}')" class="px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-colors ${activeCat===c ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200'}">${c}</button>`;
-            });
+            const cats = ['Todos', 'General', 'Bebidas', 'Alimentos', 'Snacks', 'Servicios', 'Otros']; const con = document.getElementById('cat-filters'); con.innerHTML = '';
+            cats.forEach(c => { con.innerHTML += `<button onclick="filterCat('${c}')" class="px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-colors ${activeCat===c ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200'}">${c}</button>`; });
         }
         function filterCat(c) { activeCat = c; renderPos(document.getElementById('buscador').value); renderCategories(); }
         function renderPos(f='') {
             const grid = document.getElementById('grid-productos'); grid.innerHTML = '';
             let data = DB.inv().filter(p => p.nombre.toLowerCase().includes(f.toLowerCase()) || p.id.includes(f));
             if(activeCat !== 'Todos') data = data.filter(p => (p.cat || 'General') === activeCat);
-            
             data.forEach(p => {
-                grid.innerHTML += `
-                    <div onclick="addCarro('${p.id}')" class="bg-white dark:bg-slate-800 p-4 rounded-xl border dark:border-slate-700 hover:border-indigo-500 cursor-pointer shadow-sm relative overflow-hidden ${p.stock<=0?'opacity-60':''}">
-                        ${p.stock<=5 ? '<div class="absolute top-0 right-0 bg-red-500 text-white text-[10px] px-2 py-1 font-bold rounded-bl-lg">BAJO STOCK</div>' : ''}
-                        <div class="text-[10px] text-slate-400 font-bold uppercase mb-1">${p.cat || 'GENERAL'}</div>
-                        <h3 class="font-bold text-slate-800 dark:text-white text-sm mb-3 h-10 overflow-hidden leading-tight">${p.nombre}</h3>
-                        <div class="flex justify-between items-end"><span class="text-xl font-black text-indigo-600">$${p.precio}</span><span class="text-[10px] ${p.stock<=0?'text-red-500':'text-slate-400'} font-bold">STOCK: ${p.stock}</span></div>
-                    </div>`;
+                grid.innerHTML += `<div onclick="addCarro('${p.id}')" class="bg-white dark:bg-slate-800 p-4 rounded-xl border dark:border-slate-700 hover:border-indigo-500 cursor-pointer shadow-sm relative overflow-hidden ${p.stock<=0?'opacity-60':''}"> ${p.stock<=5 ? '<div class="absolute top-0 right-0 bg-red-500 text-white text-[10px] px-2 py-1 font-bold rounded-bl-lg">BAJO STOCK</div>' : ''} <div class="text-[10px] text-slate-400 font-bold uppercase mb-1">${p.cat || 'GENERAL'}</div> <h3 class="font-bold text-slate-800 dark:text-white text-sm mb-3 h-10 overflow-hidden leading-tight">${p.nombre}</h3> <div class="flex justify-between items-end"><span class="text-xl font-black text-indigo-600">$${p.precio}</span><span class="text-[10px] ${p.stock<=0?'text-red-500':'text-slate-400'} font-bold">STOCK: ${p.stock}</span></div> </div>`;
             });
         }
-        function addCarro(id) {
-            const p = DB.inv().find(x => x.id === id); if(!p || p.stock <= 0) return showToast("Producto agotado", "error");
-            const item = carrito.find(x => x.id === id); if(item) { if(item.cant < p.stock) item.cant++; else showToast("Stock límite alcanzado", "error"); } else carrito.push({...p, cant: 1});
-            renderCart();
-        }
-        function renderCart() {
-            const list = document.getElementById('cart-list'); list.innerHTML = ''; let total = 0;
-            carrito.forEach((p, i) => { total += p.precio * p.cant; list.innerHTML += `<div class="flex justify-between items-center bg-white dark:bg-slate-700 p-2 rounded border dark:border-slate-600 text-xs dark:text-white"><div><b>${p.nombre}</b><br>$${p.precio} x ${p.cant}</div><div class="flex items-center gap-1"><button onclick="modCart(${i},-1)" class="w-6 h-6 bg-slate-100 dark:bg-slate-600 rounded text-slate-800 dark:text-white">-</button><button onclick="modCart(${i},1)" class="w-6 h-6 bg-indigo-100 dark:bg-indigo-900 rounded text-indigo-800 dark:text-white">+</button></div></div>`; });
-            document.getElementById('lbl-total').textContent = '$' + total.toFixed(2);
-            document.getElementById('cart-count').textContent = carrito.length + ' items';
-        }
+        function addCarro(id) { const p = DB.inv().find(x => x.id === id); if(!p || p.stock <= 0) return showToast("Agotado", "error"); const item = carrito.find(x => x.id === id); if(item) { if(item.cant < p.stock) item.cant++; else showToast("Stock límite", "error"); } else carrito.push({...p, cant: 1}); renderCart(); }
+        function renderCart() { const list = document.getElementById('cart-list'); list.innerHTML = ''; let total = 0; carrito.forEach((p, i) => { total += p.precio * p.cant; list.innerHTML += `<div class="flex justify-between items-center bg-white dark:bg-slate-700 p-2 rounded border dark:border-slate-600 text-xs dark:text-white"><div><b>${p.nombre}</b><br>$${p.precio} x ${p.cant}</div><div class="flex items-center gap-1"><button onclick="modCart(${i},-1)" class="w-6 h-6 bg-slate-100 dark:bg-slate-600 rounded text-slate-800 dark:text-white">-</button><button onclick="modCart(${i},1)" class="w-6 h-6 bg-indigo-100 dark:bg-indigo-900 rounded text-indigo-800 dark:text-white">+</button></div></div>`; }); document.getElementById('lbl-total').textContent = '$' + total.toFixed(2); document.getElementById('cart-count').textContent = carrito.length + ' items'; }
         function modCart(i, d) { const real = DB.inv().find(p => p.id === carrito[i].id); if(carrito[i].cant + d > 0 && carrito[i].cant + d <= real.stock) carrito[i].cant += d; else if(carrito[i].cant + d <= 0) carrito.splice(i, 1); renderCart(); }
 
-        // --- COBRO AVANZADO ---
+        // --- COBRO ---
         function abrirModalPago() {
             const total = carrito.reduce((s,i)=>s+(i.precio*i.cant),0); if(total <= 0) return showToast("Carrito vacío", "error");
-            document.getElementById('pago-total-disp').textContent = '$' + total.toFixed(2);
-            document.getElementById('input-pago-modal').value = '';
-            document.getElementById('lbl-cambio-modal').textContent = '';
-            
-            // Puntos logic
+            document.getElementById('pago-total-disp').textContent = '$' + total.toFixed(2); document.getElementById('input-pago-modal').value = ''; document.getElementById('lbl-cambio-modal').textContent = '';
             const btnPts = document.getElementById('btn-puntos-modal');
-            if(usePoints && clienteActivo && clienteActivo.puntos >= total) {
-                btnPts.classList.remove('hidden');
-                btnPts.innerHTML = `<i class="fas fa-star mr-2"></i> Pagar con Puntos (${clienteActivo.puntos} disponibles)`;
-            } else { btnPts.classList.add('hidden'); }
-
-            document.getElementById('modal-pago').classList.remove('hidden');
-            selMetodo('Efectivo');
+            if(usePoints && clienteActivo && clienteActivo.puntos >= total) { btnPts.classList.remove('hidden'); btnPts.innerHTML = `<i class="fas fa-star mr-2"></i> Pagar con Puntos (${clienteActivo.puntos} disponibles)`; } else { btnPts.classList.add('hidden'); }
+            document.getElementById('modal-pago').classList.remove('hidden'); selMetodo('Efectivo');
         }
-
         function selMetodo(m) {
-            currentMetodo = m;
-            document.querySelectorAll('.metodo-btn').forEach(b => b.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-slate-600'));
-            const btn = document.getElementById(m === 'Efectivo' ? 'btn-met-efectivo' : (m === 'Tarjeta' ? 'btn-met-tarjeta' : 'btn-met-transf'));
-            if(btn) btn.classList.add('border-indigo-500', 'bg-indigo-50', 'dark:bg-slate-600');
-            
-            const efBox = document.getElementById('pago-efectivo-box');
-            if(m === 'Efectivo') { efBox.classList.remove('hidden'); setTimeout(() => document.getElementById('input-pago-modal').focus(), 100); } 
-            else efBox.classList.add('hidden');
+            currentMetodo = m; document.querySelectorAll('.metodo-btn').forEach(b => b.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-slate-600'));
+            const btn = document.getElementById(m === 'Efectivo' ? 'btn-met-efectivo' : (m === 'Tarjeta' ? 'btn-met-tarjeta' : 'btn-met-transf')); if(btn) btn.classList.add('border-indigo-500', 'bg-indigo-50', 'dark:bg-slate-600');
+            const efBox = document.getElementById('pago-efectivo-box'); if(m === 'Efectivo') { efBox.classList.remove('hidden'); setTimeout(() => document.getElementById('input-pago-modal').focus(), 100); } else efBox.classList.add('hidden');
         }
-
-        function calcCambioModal() {
-            const total = carrito.reduce((s,i)=>s+(i.precio*i.cant),0);
-            const pago = parseFloat(document.getElementById('input-pago-modal').value) || 0;
-            const lbl = document.getElementById('lbl-cambio-modal');
-            if(pago >= total) lbl.textContent = 'Cambio: $' + (pago - total).toFixed(2);
-            else lbl.textContent = 'Faltan: $' + (total - pago).toFixed(2);
-        }
-
+        function calcCambioModal() { const total = carrito.reduce((s,i)=>s+(i.precio*i.cant),0); const pago = parseFloat(document.getElementById('input-pago-modal').value) || 0; const lbl = document.getElementById('lbl-cambio-modal'); if(pago >= total) lbl.textContent = 'Cambio: $' + (pago - total).toFixed(2); else lbl.textContent = 'Faltan: $' + (total - pago).toFixed(2); }
         function procesarPago(forcedMethod) {
-            const total = carrito.reduce((s,i)=>s+(i.precio*i.cant),0);
-            const metodo = forcedMethod || currentMetodo;
-
-            if(metodo === 'Puntos') {
-                const clis = DB.cli(); const idx = clis.findIndex(c => c.id === clienteActivo.id);
-                clis[idx].puntos -= total; DB.save('coco_clientes', clis);
-                saveVenta(total, 'Puntos', 0, clienteActivo.id);
-            } else {
-                if(metodo === 'Efectivo') {
-                    const pago = parseFloat(document.getElementById('input-pago-modal').value);
-                    if(!pago || pago < total) return showToast("Pago insuficiente", "error");
-                }
-                let pts = 0;
-                if(usePoints && clienteActivo) { 
-                    const clis = DB.cli(); const idx = clis.findIndex(c => c.id === clienteActivo.id); 
-                    pts = Math.floor(total/10); clis[idx].puntos += pts; DB.save('coco_clientes', clis); 
-                }
-                saveVenta(total, metodo, pts, clienteActivo ? clienteActivo.id : 'General');
-            }
-            document.getElementById('modal-pago').classList.add('hidden');
-            showToast("¡Venta Exitosa!", "success");
-            
-            // Auto Print Ticket Prompt
-            if(confirm("¿Imprimir Ticket?")) printTicket(DB.ven()[0]);
-
+            const total = carrito.reduce((s,i)=>s+(i.precio*i.cant),0); const metodo = forcedMethod || currentMetodo;
+            if(metodo === 'Puntos') { const clis = DB.cli(); const idx = clis.findIndex(c => c.id === clienteActivo.id); clis[idx].puntos -= total; DB.save('coco_clientes', clis); saveVenta(total, 'Puntos', 0, clienteActivo.id); } 
+            else { if(metodo === 'Efectivo') { const pago = parseFloat(document.getElementById('input-pago-modal').value); if(!pago || pago < total) return showToast("Pago insuficiente", "error"); } let pts = 0; if(usePoints && clienteActivo) { const clis = DB.cli(); const idx = clis.findIndex(c => c.id === clienteActivo.id); pts = Math.floor(total/10); clis[idx].puntos += pts; DB.save('coco_clientes', clis); } saveVenta(total, metodo, pts, clienteActivo ? clienteActivo.id : 'General'); }
+            document.getElementById('modal-pago').classList.add('hidden'); showToast("¡Venta Exitosa!", "success");
+            if(usePrinter && confirm("¿Imprimir Ticket?")) printTicket(DB.ven()[0]);
             carrito = []; quitarCliente(); renderCart(); renderPos(document.getElementById('buscador').value);
         }
-
         function saveVenta(total, metodo, pts, cliId) {
-            const inv = DB.inv(); carrito.forEach(item => { const p = inv.find(x => x.id === item.id); if(p) p.stock -= item.cant; });
-            DB.save('coco_inv', inv);
-            const ven = DB.ven(); 
-            const nuevaVenta = { 
-                id: Date.now(), 
-                fecha: new Date().toLocaleString(), 
-                fechaRaw: new Date(), 
-                total, metodo, puntos: pts, 
-                vendedor: currentUser.user, 
-                cliente: cliId,
-                items: [...carrito] // Save items for ticket
-            };
-            ven.unshift(nuevaVenta);
-            DB.save('coco_ven', ven);
-            renderHist();
+            const inv = DB.inv(); carrito.forEach(item => { const p = inv.find(x => x.id === item.id); if(p) p.stock -= item.cant; }); DB.save('coco_inv', inv);
+            const ven = DB.ven(); ven.unshift({ id: Date.now(), fecha: new Date().toLocaleString(), fechaRaw: new Date(), total, metodo, puntos: pts, vendedor: currentUser.user, cliente: cliId, items: [...carrito] }); DB.save('coco_ven', ven); renderHist();
         }
-
-        // --- TICKET & EXPORT ---
         function printTicket(v) {
-            const win = window.open('', '', 'width=300,height=600');
-            let itemsHtml = '';
-            (v.items || []).forEach(i => itemsHtml += `<div>${i.nombre} <span style="float:right">$${(i.precio*i.cant).toFixed(2)}</span><br><small>${i.cant} x $${i.precio}</small></div><hr style="border-top: 1px dashed #ccc; margin: 5px 0;">`);
-            
-            win.document.write(`
-                <html><body style="font-family: monospace; font-size: 12px; width: 280px; margin: 0 auto;">
-                    <div style="text-align: center; margin-bottom: 10px;">
-                        <h2 style="margin:0">COCOLANDIA</h2>
-                        <p style="margin:0">Ticket #${v.id.toString().slice(-4)}</p>
-                        <p style="margin:0">${v.fecha}</p>
-                    </div>
-                    <hr>
-                    ${itemsHtml}
-                    <div style="text-align: right; margin-top: 10px;">
-                        <h3 style="margin:0">TOTAL: $${v.total.toFixed(2)}</h3>
-                        <p style="margin:0">Pago: ${v.metodo}</p>
-                    </div>
-                    <div style="text-align: center; margin-top: 20px;">
-                        <p>¡Gracias por su compra!</p>
-                    </div>
-                </body></html>
-            `);
-            win.document.close();
-            win.focus();
-            setTimeout(() => { win.print(); win.close(); }, 500);
+            const win = window.open('', '', 'width=300,height=600'); let itemsHtml = ''; (v.items || []).forEach(i => itemsHtml += `<div>${i.nombre} <span style="float:right">$${(i.precio*i.cant).toFixed(2)}</span><br><small>${i.cant} x $${i.precio}</small></div><hr style="border-top: 1px dashed #ccc; margin: 5px 0;">`);
+            win.document.write(`<html><body style="font-family: monospace; font-size: 12px; width: 280px; margin: 0 auto;"><div style="text-align: center; margin-bottom: 10px;"><h2 style="margin:0">COCOLANDIA</h2><p style="margin:0">Ticket #${v.id.toString().slice(-4)}</p><p style="margin:0">${v.fecha}</p></div><hr>${itemsHtml}<div style="text-align: right; margin-top: 10px;"><h3 style="margin:0">TOTAL: $${v.total.toFixed(2)}</h3><p style="margin:0">Pago: ${v.metodo}</p></div><div style="text-align: center; margin-top: 20px;"><p>¡Gracias por su compra!</p></div></body></html>`);
+            win.document.close(); win.focus(); setTimeout(() => { win.print(); win.close(); }, 500);
         }
+        function exportToExcel() { const ventas = DB.ven(); let csv = "ID,Fecha,Vendedor,Cliente,Metodo,Total\n"; ventas.forEach(v => { csv += `${v.id},"${v.fecha}",${v.vendedor},${v.cliente},${v.metodo},${v.total}\n`; }); const blob = new Blob([csv], { type: 'text/csv' }); const a = document.createElement('a'); a.href = window.URL.createObjectURL(blob); a.download = `Ventas_Cocolandia.csv`; a.click(); showToast("Reporte descargado", "success"); }
 
-        function exportToExcel() {
-            const ventas = DB.ven();
-            let csv = "ID,Fecha,Vendedor,Cliente,Metodo,Total\n";
-            ventas.forEach(v => {
-                csv += `${v.id},"${v.fecha}",${v.vendedor},${v.cliente},${v.metodo},${v.total}\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = `Ventas_Cocolandia_${new Date().toISOString().slice(0,10)}.csv`;
-            a.click();
-            showToast("Reporte descargado", "success");
-        }
+        // --- CRUD INV ---
+        function renderInvTable() { const t = document.getElementById('table-inv'); t.innerHTML = ''; DB.inv().forEach(p => { const canEdit = currentUser && currentUser.perms.inv; t.innerHTML += `<tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50"><td class="p-4 text-xs font-bold">${p.id}</td><td class="p-4 text-xs">${p.nombre}</td><td class="p-4 text-xs"><span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-[10px] uppercase font-bold">${p.cat || 'General'}</span></td><td class="p-4 text-xs">$${p.precio}</td><td class="p-4 text-xs font-bold ${p.stock<=5?'text-red-500':''}">${p.stock}</td><td class="p-4 text-right">${canEdit ? `<button onclick="editProduct('${p.id}')" class="text-blue-500 hover:text-blue-700 mr-2"><i class="fas fa-edit"></i></button><button onclick="deleteProduct('${p.id}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>` : ''}</td></tr>`; }); }
+        function modalProducto(id = null) { document.getElementById('modal-producto').classList.remove('hidden'); if(id) { const p = DB.inv().find(x => x.id === id); document.getElementById('modal-prod-title').textContent = "Editar Producto"; document.getElementById('prod-id').value = p.id; document.getElementById('prod-id').disabled = true; document.getElementById('prod-nom').value = p.nombre; document.getElementById('prod-precio').value = p.precio; document.getElementById('prod-stock').value = p.stock; document.getElementById('prod-cat').value = p.cat || 'General'; } else { document.getElementById('modal-prod-title').textContent = "Nuevo Producto"; document.getElementById('prod-id').value = ''; document.getElementById('prod-id').disabled = false; document.getElementById('prod-nom').value = ''; document.getElementById('prod-precio').value = ''; document.getElementById('prod-stock').value = ''; document.getElementById('prod-cat').value = 'General'; } }
+        function saveProduct(e) { e.preventDefault(); const inv = DB.inv(); const id = document.getElementById('prod-id').value; const isEdit = document.getElementById('prod-id').disabled; if(!isEdit && inv.some(x => x.id === id)) return showToast("Ese código ya existe", "error"); const prodData = { id: id, nombre: document.getElementById('prod-nom').value, precio: parseFloat(document.getElementById('prod-precio').value), stock: parseInt(document.getElementById('prod-stock').value), cat: document.getElementById('prod-cat').value }; if(isEdit) { const idx = inv.findIndex(x => x.id === id); inv[idx] = prodData; } else { inv.push(prodData); } DB.save('coco_inv', inv); document.getElementById('modal-producto').classList.add('hidden'); renderInvTable(); renderPos(document.getElementById('buscador').value); showToast("Producto guardado", "success"); }
+        function editProduct(id) { modalProducto(id); }
+        function deleteProduct(id) { if(confirm("¿Eliminar producto?")) { const inv = DB.inv().filter(x => x.id !== id); DB.save('coco_inv', inv); renderInvTable(); renderPos(document.getElementById('buscador').value); showToast("Producto eliminado", "success"); } }
 
-        // --- INVENTARIO CRUD ---
-        function renderInvTable() {
-            const t = document.getElementById('table-inv'); t.innerHTML = '';
-            DB.inv().forEach(p => {
-                const canEdit = currentUser && currentUser.perms.inv;
-                t.innerHTML += `
-                <tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                    <td class="p-4 text-xs font-bold">${p.id}</td>
-                    <td class="p-4 text-xs">${p.nombre}</td>
-                    <td class="p-4 text-xs"><span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-[10px] uppercase font-bold">${p.cat || 'General'}</span></td>
-                    <td class="p-4 text-xs">$${p.precio}</td>
-                    <td class="p-4 text-xs font-bold ${p.stock<=5?'text-red-500':''}">${p.stock}</td>
-                    <td class="p-4 text-right">
-                        ${canEdit ? `<button onclick="editProduct('${p.id}')" class="text-blue-500 hover:text-blue-700 mr-2"><i class="fas fa-edit"></i></button>
-                        <button onclick="deleteProduct('${p.id}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>` : ''}
-                    </td>
-                </tr>`;
-            });
-        }
+        // --- USERS (NUEVO: EDITAR) ---
+        function modalUsuario(user = null) {
+            document.getElementById('modal-usuario').classList.remove('hidden');
+            if(user) {
+                // Modo Edición
+                document.getElementById('modal-user-title').textContent = "Editar Usuario";
+                document.getElementById('edit-user-idx').value = user; // Guardamos el user ID original
+                
+                const u = DB.users().find(x => x.user === user);
+                document.getElementById('new-user-name').value = u.name;
+                document.getElementById('new-user-login').value = u.user;
+                document.getElementById('new-user-login').disabled = true; // No se puede cambiar el ID para no romper integridad
+                document.getElementById('new-user-login').classList.add('bg-slate-100','dark:bg-slate-700','opacity-50');
+                
+                document.getElementById('new-user-pass').value = ''; // Vacío para no cambiar
+                document.getElementById('new-user-pass').placeholder = "(Sin cambios)";
+                document.getElementById('hint-pass').classList.remove('hidden');
 
-        function modalProducto(id = null) {
-            document.getElementById('modal-producto').classList.remove('hidden');
-            if(id) {
-                const p = DB.inv().find(x => x.id === id);
-                document.getElementById('modal-prod-title').textContent = "Editar Producto";
-                document.getElementById('prod-id').value = p.id; document.getElementById('prod-id').disabled = true;
-                document.getElementById('prod-nom').value = p.nombre;
-                document.getElementById('prod-precio').value = p.precio;
-                document.getElementById('prod-stock').value = p.stock;
-                document.getElementById('prod-cat').value = p.cat || 'General';
+                // Set Perms
+                const p = u.perms || {};
+                document.getElementById('perm-pos').checked = p.pos;
+                document.getElementById('perm-ventas').checked = p.ventas;
+                document.getElementById('perm-clientes').checked = p.clientes;
+                document.getElementById('perm-inv').checked = p.inv;
+                document.getElementById('perm-admin').checked = p.admin;
             } else {
-                document.getElementById('modal-prod-title').textContent = "Nuevo Producto";
-                document.getElementById('prod-id').value = ''; document.getElementById('prod-id').disabled = false;
-                document.getElementById('prod-nom').value = '';
-                document.getElementById('prod-precio').value = '';
-                document.getElementById('prod-stock').value = '';
-                document.getElementById('prod-cat').value = 'General';
+                // Modo Crear
+                document.getElementById('modal-user-title').textContent = "Nuevo Usuario";
+                document.getElementById('edit-user-idx').value = "-1";
+                document.getElementById('new-user-name').value = '';
+                document.getElementById('new-user-login').value = '';
+                document.getElementById('new-user-login').disabled = false;
+                document.getElementById('new-user-login').classList.remove('bg-slate-100','dark:bg-slate-700','opacity-50');
+                document.getElementById('new-user-pass').value = '';
+                document.getElementById('new-user-pass').placeholder = "Contraseña";
+                document.getElementById('hint-pass').classList.add('hidden');
             }
         }
 
-        function saveProduct(e) {
+        function saveUser(e) {
             e.preventDefault();
-            const inv = DB.inv();
-            const id = document.getElementById('prod-id').value;
-            const isEdit = document.getElementById('prod-id').disabled;
+            const users = DB.users();
+            const editId = document.getElementById('edit-user-idx').value;
+            const uInput = document.getElementById('new-user-login').value.trim();
+            const passInput = document.getElementById('new-user-pass').value;
 
-            if(!isEdit && inv.some(x => x.id === id)) return showToast("Ese código ya existe", "error");
-
-            const prodData = {
-                id: id,
-                nombre: document.getElementById('prod-nom').value,
-                precio: parseFloat(document.getElementById('prod-precio').value),
-                stock: parseInt(document.getElementById('prod-stock').value),
-                cat: document.getElementById('prod-cat').value
+            const userData = {
+                user: uInput,
+                name: document.getElementById('new-user-name').value,
+                role: document.getElementById('perm-admin').checked ? 'admin' : 'user', 
+                perms: {
+                    pos: document.getElementById('perm-pos').checked,
+                    ventas: document.getElementById('perm-ventas').checked,
+                    clientes: document.getElementById('perm-clientes').checked,
+                    inv: document.getElementById('perm-inv').checked,
+                    admin: document.getElementById('perm-admin').checked
+                }
             };
 
-            if(isEdit) {
-                const idx = inv.findIndex(x => x.id === id);
-                inv[idx] = prodData;
+            if(editId !== "-1") {
+                // UPDATE
+                const idx = users.findIndex(x => x.user === editId);
+                if(passInput) userData.pass = passInput; else userData.pass = users[idx].pass; // Mantener pass vieja si vacía
+                users[idx] = userData;
+                showToast("Usuario actualizado", "success");
             } else {
-                inv.push(prodData);
+                // CREATE
+                if(users.some(x => x.user.toLowerCase() === uInput.toLowerCase())) return showToast("El usuario ya existe", "error");
+                if(!passInput) return showToast("Contraseña requerida", "error");
+                userData.pass = passInput;
+                users.push(userData);
+                showToast("Usuario creado", "success");
             }
-            DB.save('coco_inv', inv);
-            document.getElementById('modal-producto').classList.add('hidden');
-            renderInvTable(); renderPos(document.getElementById('buscador').value);
-            showToast("Producto guardado", "success");
+            
+            DB.save('coco_users', users);
+            document.getElementById('modal-usuario').classList.add('hidden');
+            renderUsersTable();
         }
 
-        function editProduct(id) { modalProducto(id); }
-        function deleteProduct(id) {
-            if(confirm("¿Eliminar producto?")) {
-                const inv = DB.inv().filter(x => x.id !== id);
-                DB.save('coco_inv', inv);
-                renderInvTable(); renderPos(document.getElementById('buscador').value);
-                showToast("Producto eliminado", "success");
-            }
-        }
+        function editUser(u) { modalUsuario(u); }
+        function deleteUser(user) { if(user === currentUser.user) return showToast("No puedes auto-eliminarte", "error"); if(user === 'Admin') return showToast("Admin principal protegido", "error"); if(confirm("¿Eliminar usuario?")) { const users = DB.users().filter(x => x.user !== user); DB.save('coco_users', users); renderUsersTable(); showToast("Usuario eliminado", "success"); } }
+        function renderUsersTable() { const t = document.getElementById('table-users'); t.innerHTML = ''; DB.users().forEach(u => { const p = u.perms || { admin: u.role === 'admin' }; let badges = ''; if(p.admin) badges += '<span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-bold mr-1">ADMIN</span>'; else { if(p.pos) badges += '<span class="bg-slate-100 text-slate-600 px-1 rounded text-[10px] mr-1">Caja</span>'; if(p.ventas) badges += '<span class="bg-slate-100 text-slate-600 px-1 rounded text-[10px] mr-1">Hist</span>'; if(p.inv) badges += '<span class="bg-slate-100 text-slate-600 px-1 rounded text-[10px] mr-1">Inv</span>'; } t.innerHTML += `<tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50"><td class="p-4 text-xs font-bold">${u.user}</td><td class="p-4 text-xs">${u.name}</td><td class="p-4">${badges}</td><td class="p-4 text-right"> <button onclick="editUser('${u.user}')" class="text-blue-500 hover:text-blue-700 mr-2"><i class="fas fa-edit"></i></button> ${u.user !== 'Admin' && u.user !== currentUser.user ? `<button onclick="deleteUser('${u.user}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>` : ''}</td></tr>`; }); }
 
-        // --- SISTEMA CLIENTES Y USUARIOS (Mantener igual a v5) ---
+        // --- OTROS ---
         function buscarCliente() { const q = document.getElementById('input-client').value.trim(); const c = DB.cli().find(x => x.id === q || x.telefono === q); if(c) { clienteActivo = c; updateClienteUI(); } else showToast("Cliente no encontrado", "error"); }
-        function updateClienteUI() { 
-            const badge = document.getElementById('puntos-badge');
-            if(clienteActivo) { document.getElementById('client-search-box').classList.add('hidden'); document.getElementById('client-info-box').classList.remove('hidden'); document.getElementById('lbl-cli-nombre').textContent = clienteActivo.nombre; document.getElementById('lbl-cli-id').textContent = 'ID: ' + clienteActivo.id; if(usePoints) { badge.textContent = clienteActivo.puntos + ' pts'; badge.classList.remove('hidden'); } else badge.classList.add('hidden'); }
-            else { document.getElementById('client-search-box').classList.remove('hidden'); document.getElementById('client-info-box').classList.add('hidden'); badge.classList.add('hidden'); }
-        }
+        function updateClienteUI() { const badge = document.getElementById('puntos-badge'); if(clienteActivo) { document.getElementById('client-search-box').classList.add('hidden'); document.getElementById('client-info-box').classList.remove('hidden'); document.getElementById('lbl-cli-nombre').textContent = clienteActivo.nombre; document.getElementById('lbl-cli-id').textContent = 'ID: ' + clienteActivo.id; if(usePoints) { badge.textContent = clienteActivo.puntos + ' pts'; badge.classList.remove('hidden'); } else badge.classList.add('hidden'); } else { document.getElementById('client-search-box').classList.remove('hidden'); document.getElementById('client-info-box').classList.add('hidden'); badge.classList.add('hidden'); } }
         function quitarCliente() { clienteActivo = null; updateClienteUI(); }
         function modalCliente() { document.getElementById('new-cli-id').value = 'WT' + Date.now().toString().slice(-5); document.getElementById('modal-cliente').classList.remove('hidden'); }
         function saveCliente(e) { e.preventDefault(); const clis = DB.cli(); clis.push({ id: document.getElementById('new-cli-id').value, nombre: document.getElementById('new-cli-nom').value, telefono: document.getElementById('new-cli-tel').value, puntos: 0 }); DB.save('coco_clientes', clis); document.getElementById('modal-cliente').classList.add('hidden'); renderCliTable(); showToast("Cliente registrado", "success"); }
         function renderCliTable() { const t = document.getElementById('table-clientes'); t.innerHTML = ''; DB.cli().forEach(c => t.innerHTML += `<tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50"><td class="p-3 text-xs font-bold">${c.id}</td><td class="p-3 text-xs">${c.nombre}</td><td class="p-3 text-xs text-orange-600 font-bold">${c.puntos} pts</td></tr>`); }
         function renderHist() { const l = document.getElementById('list-ventas'); l.innerHTML = ''; DB.ven().forEach(v => l.innerHTML += `<div class="bg-white dark:bg-slate-800 p-3 border dark:border-slate-700 rounded text-xs flex justify-between dark:text-slate-300 items-center"><div><b>#${v.id.toString().slice(-4)}</b> - ${v.vendedor}<br><span class="text-[10px] text-slate-400">${v.fecha} • ${v.metodo}</span></div><div class="text-right"><b class="text-lg">$${v.total.toFixed(2)}</b><br><button onclick='printTicket(${JSON.stringify(v)})' class="text-blue-500 hover:underline text-[10px]"><i class="fas fa-print"></i> Ticket</button></div></div>`); }
-        
-        // Users
-        function modalUsuario() { document.getElementById('new-user-name').value = ''; document.getElementById('new-user-login').value = ''; document.getElementById('new-user-pass').value = ''; document.getElementById('modal-usuario').classList.remove('hidden'); }
-        function saveUser(e) { e.preventDefault(); const users = DB.users(); const u = document.getElementById('new-user-login').value.trim(); if(users.some(x => x.user.toLowerCase() === u.toLowerCase())) return showToast("El usuario ya existe", "error"); const newUser = { user: u, name: document.getElementById('new-user-name').value, pass: document.getElementById('new-user-pass').value, role: document.getElementById('perm-admin').checked ? 'admin' : 'user', perms: { pos: document.getElementById('perm-pos').checked, ventas: document.getElementById('perm-ventas').checked, clientes: document.getElementById('perm-clientes').checked, inv: document.getElementById('perm-inv').checked, admin: document.getElementById('perm-admin').checked } }; users.push(newUser); DB.save('coco_users', users); document.getElementById('modal-usuario').classList.add('hidden'); renderUsersTable(); showToast("Usuario creado", "success"); }
-        function deleteUser(user) { if(user === currentUser.user) return showToast("No puedes auto-eliminarte", "error"); if(user === 'Admin') return showToast("Admin principal protegido", "error"); if(confirm("¿Eliminar usuario?")) { const users = DB.users().filter(x => x.user !== user); DB.save('coco_users', users); renderUsersTable(); showToast("Usuario eliminado", "success"); } }
-        function renderUsersTable() { const t = document.getElementById('table-users'); t.innerHTML = ''; DB.users().forEach(u => { const p = u.perms || { admin: u.role === 'admin' }; let badges = ''; if(p.admin) badges += '<span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-bold mr-1">ADMIN</span>'; else { if(p.pos) badges += '<span class="bg-slate-100 text-slate-600 px-1 rounded text-[10px] mr-1">Caja</span>'; if(p.ventas) badges += '<span class="bg-slate-100 text-slate-600 px-1 rounded text-[10px] mr-1">Hist</span>'; if(p.inv) badges += '<span class="bg-slate-100 text-slate-600 px-1 rounded text-[10px] mr-1">Inv</span>'; } t.innerHTML += `<tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50"><td class="p-4 text-xs font-bold">${u.user}</td><td class="p-4 text-xs">${u.name}</td><td class="p-4">${badges}</td><td class="p-4 text-right">${u.user !== 'Admin' && u.user !== currentUser.user ? `<button onclick="deleteUser('${u.user}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>` : ''}</td></tr>`; }); }
-        
-        // --- CIERRE DE CAJA ---
         function prepararCierreCaja() { if (!currentUser) return; const ahora = new Date(); const inicio = new Date(currentUser.inicioTurno); const difMs = ahora - inicio; const horas = Math.floor(difMs / 3600000); const minutos = Math.floor((difMs % 3600000) / 60000); const ventasTurno = DB.ven().filter(v => v.vendedor === currentUser.user && new Date(v.fechaRaw || v.id) >= inicio); const totalEfec = ventasTurno.filter(v => v.metodo === 'Efectivo').reduce((s, v) => s + v.total, 0); const totalOtros = ventasTurno.filter(v => v.metodo !== 'Efectivo' && v.metodo !== 'Puntos').reduce((s, v) => s + v.total, 0); const data = { vendedor: currentUser.user, nombre: currentUser.name, fechaInicio: inicio.toLocaleString(), fechaCierre: ahora.toLocaleString(), tiempo: `${horas}h ${minutos}m`, efectivo: totalEfec, otros: totalOtros, total: totalEfec + totalOtros, numVentas: ventasTurno.length }; const modal = document.createElement('div'); modal.id = 'modal-cierre'; modal.className = 'fixed inset-0 bg-slate-900 z-[100] flex items-center justify-center p-4 backdrop-blur-sm'; modal.innerHTML = `<div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl p-6 font-mono text-sm dark:text-slate-300"><div class="text-center border-b-2 border-dashed border-slate-200 pb-4 mb-4"><h2 class="text-xl font-black text-slate-800 dark:text-white">CIERRE DE TURNO</h2></div><div class="space-y-1 mb-4"><p><b>CAJERO:</b> ${data.nombre}</p><p><b>TIEMPO:</b> ${data.tiempo}</p></div><div class="border-b-2 border-dashed border-slate-200 pb-4 mb-4"><div class="flex justify-between"><span>Efectivo</span> <span>$${data.efectivo.toFixed(2)}</span></div><div class="flex justify-between"><span>Tarj/Transf</span> <span>$${data.otros.toFixed(2)}</span></div><div class="flex justify-between font-bold text-lg mt-2 pt-2 border-t"><span>TOTAL</span> <span>$${data.total.toFixed(2)}</span></div></div><button onclick='confirmarCierre(${JSON.stringify(data)})' class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold">CERRAR TURNO</button></div>`; document.body.appendChild(modal); }
         function confirmarCierre(data) { const turnos = DB.turnos(); turnos.push(data); DB.save('coco_turnos', turnos); showToast("Turno cerrado", "success"); document.getElementById('modal-cierre').remove(); logout(); }
         function factoryReset() { if(!currentUser || !currentUser.perms.admin) return showToast("No tienes permiso", "error"); if(confirm("¿RESET DE FÁBRICA TOTAL?")) { DB.clear(); location.reload(); } }
